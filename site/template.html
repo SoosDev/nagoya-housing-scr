@@ -1,5 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title>Nagoya Home Shortlist</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -108,6 +109,7 @@ button{font:inherit;color:var(--accent);background:var(--surface);border:1px sol
       <li><b>Listings:</b> <span id="mTotal"></span> SUUMO listings in 千種・東・昭和・瑞穂・名東・天白 met the walk and age limits this week. <span id="mShown"></span> remain after keeping target school districts and merging duplicate agent ads. A refresh runs every Monday morning (JST). Prices and specs come from SUUMO list pages and are not re-checked against detail pages.</li>
       <li><b>School district:</b> matched by 町名/丁目 against the city's official 通学区域 lists (as of 1 Sept 2026). Where the city marks a 番地-level split, two schools appear; confirm with the ward office. No official school ranking exists. The 12 districts are the ones repeatedly cited by real-estate sources.</li>
       <li><b>Flood flag:</b> "Avoid" means the 町 is named in Sept 2026 damage reports or on the city hazard maps. "Caution" means partly on a map, next to 山崎川, below 10 m ground elevation, or more than 5 m below its immediate surroundings (GSI elevation data). "No flag found" only means research found nothing; it is not a clearance. Street-level damage locations from Sept 2026 were not published, so check each address on the city hazard map or 重ねるハザードマップ.</li>
+      <li><b>River flood depth:</b> the deepest depth on GSI's 洪水浸水想定区域 (想定最大規模) within 100 m of the listing's 丁目 point. The point is approximate, so check the exact address. It does not cover inland rain flooding (内水); GSI publishes no 内水 data for these wards. "Elevation unknown" means the GSI elevation lookup failed, so the low-ground checks behind the flood flag did not run.</li>
       <li><b>Ward damage:</b> homes damaged in the ward on 8 Sept 2026 (city figures as of 30 Sept). 昭和区 was hit hardest in the city.</li>
       <li><b>Map:</b> pins sit at the 丁目 point from GSI address search, not at the building, so listings in the same 丁目 share one pin. The flood layer is GSI's 洪水浸水想定区域 (想定最大規模, river flooding). It does not cover inland rain flooding (内水) such as the 8 Sept 2026 damage; use the city hazard map for that.</li>
       <li><b>Station amenities:</b> supermarkets and clinics within 600 m of the listed station, from Google Places. Counts are minimums.</li>
@@ -118,6 +120,7 @@ button{font:inherit;color:var(--accent);background:var(--surface);border:1px sol
   <div class="filters">
     <label for="fType">Type<select id="fType"><option value="">All</option><option value="__new">New this week</option><option>中古マンション</option><option>新築マンション</option><option>中古一戸建て</option><option>新築一戸建て</option></select></label>
     <label for="fFlood">Flood flag<select id="fFlood"><option value="nf">No flag only</option><option value="nfc" selected>Hide Avoid</option><option value="">All</option></select></label>
+    <label for="fRiver">River flood<select id="fRiver"><option value="">Any</option><option value="0">None mapped</option><option value="1">Under 0.5 m</option><option value="2">Under 3 m</option></select></label>
     <label for="fJH">中学校学区<select id="fJH"><option value="">All</option></select></label>
     <label for="fWard">Ward<select id="fWard"><option value="">All</option></select></label>
     <label for="fRooms">Layout<select id="fRooms"><option value="">Any</option><option value="2">2+ bedrooms</option><option value="3">3+ bedrooms</option><option value="4">4+ bedrooms</option></select></label>
@@ -162,10 +165,11 @@ const score = r => (r.f === 'No flag found' ? 30 : r.f === 'Caution' ? 10 : 0)
 DATA.forEach(r => r.s = score(r));
 let shown = 40;
 function filtered(){
-  const t = $('fType').value, fl = $('fFlood').value, jh = $('fJH').value, w = $('fWard').value,
+  const t = $('fType').value, fl = $('fFlood').value, rv = $('fRiver').value, jh = $('fJH').value, w = $('fWard').value,
         rm = +$('fRooms').value || 0, mx = +$('fMax').value || Infinity, so = $('fSort').value;
   const out = DATA.filter(r => (!t || (t === '__new' ? r.fs === META.updated : r.t === t))
     && (fl === '' || (fl === 'nf' ? r.f === 'No flag found' : r.f !== 'Avoid'))
+    && (rv === '' || (r.rv != null && r.rv <= +rv))
     && (!jh || (r.tj || '').includes(jh)) && (!w || r.w === w)
     && rooms(r.l) >= rm && (r.p == null ? mx === Infinity : r.p <= mx));
   const k = {score:(a,b)=>b.s-a.s, pa:(a,b)=>(a.p??1e9)-(b.p??1e9), pd:(a,b)=>(b.p??-1)-(a.p??-1),
@@ -173,8 +177,15 @@ function filtered(){
   return out.sort(k);
 }
 function chipFlood(r){
-  const c = r.f === 'Avoid' ? 'bad' : r.f === 'Caution' ? 'warn' : 'ok';
-  return `<span class="chip ${c}">${r.f}</span>` + (r.fs === META.updated ? ' <span class="chip new">New</span>' : '');
+  const unchecked = r.f === 'No flag found' && r.e == null;  // elevation lookup failed, so only the town lists were checked
+  const c = unchecked ? '' : r.f === 'Avoid' ? 'bad' : r.f === 'Caution' ? 'warn' : 'ok';
+  return `<span class="chip ${c}">${r.f}${unchecked ? ' · elevation unknown' : ''}</span>` + (r.fs === META.updated ? ' <span class="chip new">New</span>' : '');
+}
+const RIVER = ['No river flood mapped', 'River flood <0.5m', 'River flood 0.5–3m', 'River flood 3–5m', 'River flood 5–10m', 'River flood 10m+'];
+function chipRiver(r){
+  if (r.rv == null) return '<span class="chip">River flood unknown</span>';
+  const c = r.rv >= 3 ? 'bad' : r.rv === 2 ? 'warn' : '';
+  return `<span class="chip ${c}" title="Deepest GSI river-flood depth (max scale) within 100 m of the 丁目 point">${RIVER[r.rv]}</span>`;
 }
 function card(r){
   const age = r.by ? `${2026 - r.by}年` : (r.t.startsWith('新築') ? '新築' : '');
@@ -182,7 +193,7 @@ function card(r){
     <div class="top"><div class="name"><span class="type">${r.t}</span>${esc(r.n)}</div><div class="price">${r.pt && r.p == null ? esc(r.pt) : yen(r.p)}</div></div>
     <div class="facts"><span><b>${esc(r.l)}</b></span><span><b>${esc(r.a)}</b>m²</span>${r.ld ? `<span>土地 <b>${esc(String(r.ld))}</b>m²</span>` : ''}<span>${r.b ? '築 <b>' + esc(r.b) + '</b>' : esc(age)}</span><span>${esc(r.st)} 徒歩<b>${r.wk ?? '?'}</b>分</span></div>
     <div class="facts"><span>${esc(r.ad)}</span></div>
-    <div class="chips">${chipFlood(r)}<span class="chip">${esc(r.jh)}</span><span class="chip">${esc(r.es)}</span>
+    <div class="chips">${chipFlood(r)}${chipRiver(r)}<span class="chip">${esc(r.jh)}</span><span class="chip">${esc(r.es)}</span>
       ${r.e != null ? `<span class="chip num">標高 ${r.e.toFixed(0)}m${r.rl != null ? ` (${r.rl >= 0 ? '+' : ''}${r.rl.toFixed(0)})` : ''}</span>` : ''}</div>
     ${r.fr ? `<div class="reason">${esc(r.fr)}</div>` : ''}
     <div class="foot"><span>駅周辺: スーパー ${r.sm ?? '?'}${r.sn ? ' · ' + esc(r.sn) : ''} · クリニック ${r.cl ?? '?'}${r.pd ? ' · 小児科 ' + r.pd : ''} · ${esc(r.w)} 9/8被害 ${r.wd ?? '?'}棟</span><a href="${r.u}" target="_blank" rel="noopener">SUUMO →</a></div>
@@ -311,7 +322,7 @@ function stats(){
     ['Flagged Avoid', DATA.filter(r => r.f === 'Avoid').length], ['New this week', META.new]];
   $('stats').innerHTML = s.map(([k, v]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join('');
 }
-['fType','fFlood','fJH','fWard','fRooms','fMax','fSort'].forEach(id => $(id).addEventListener('input', () => { shown = 40; render(); }));
+['fType','fFlood','fRiver','fJH','fWard','fRooms','fMax','fSort'].forEach(id => $(id).addEventListener('input', () => { shown = 40; render(); }));
 $('more').addEventListener('click', () => { shown += 40; render(); });
 stats(); setView(view);
 </script>

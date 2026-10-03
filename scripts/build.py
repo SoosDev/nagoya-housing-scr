@@ -1,12 +1,14 @@
 """Join scraped listings with school districts, flood rules, elevation and station amenities,
 then render site/index.html into _site/.
 """
-import json, re, sys, time, unicodedata
+import json, math, re, sys, time, unicodedata
 from datetime import date
+from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
 import requests
+from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
 import config
@@ -128,6 +130,58 @@ def geo_lookup(q, budget):
     return c, rel
 
 
+# ---------- river flood depth (GSI 洪水浸水想定区域, 想定最大規模), cached ----------
+FLOOD_TILES = 'https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png'
+# Legend colour -> depth class: 1 <0.5 m, 2 0.5-3 m, 3 3-5 m, 4 5-10 m, 5 10 m+ (GSI sub-shades fold into their band)
+FLOOD_CLASS = {(0xff, 0xff, 0xb3): 1, (0xf7, 0xf5, 0xa9): 1, (0xf8, 0xe1, 0xa6): 2, (0xff, 0xd8, 0xc0): 2,
+               (0xff, 0xb7, 0xb7): 3, (0xff, 0x91, 0x91): 4, (0xf2, 0x85, 0xc9): 5, (0xdc, 0x7a, 0xdc): 5}
+FLOOD_Z, FLOOD_RADIUS_M = 16, 100
+RIVER = dict(zip(GEO.geo_q, GEO.river_cls)) if 'river_cls' in GEO else {}
+_tiles = {}
+
+
+def _flood_tile(x, y):
+    if (x, y) not in _tiles:
+        r = sess.get(FLOOD_TILES.format(z=FLOOD_Z, x=x, y=y), timeout=20)
+        time.sleep(0.3)
+        if r.status_code == 404:
+            _tiles[(x, y)] = None  # no mapped flooding in this tile
+        else:
+            r.raise_for_status()
+            _tiles[(x, y)] = Image.open(BytesIO(r.content)).convert('RGBA')
+    return _tiles[(x, y)]
+
+
+def river_depth(q, lat, lon):
+    """Deepest river-flood class within FLOOD_RADIUS_M of the point (0 = none mapped), or None if unknown."""
+    v = RIVER.get(q)
+    if v is not None and not pd.isna(v):
+        return int(v)
+    if lat is None:
+        return None
+    n = 2 ** FLOOD_Z * 256
+    px = (lon + 180) / 360 * n
+    py = (1 - math.asinh(math.tan(math.radians(lat))) / math.pi) / 2 * n
+    rad = FLOOD_RADIUS_M / (40075016.7 * math.cos(math.radians(lat)) / n)
+    best = 0
+    try:
+        for gy in range(int(py - rad), int(py + rad) + 1):
+            for gx in range(int(px - rad), int(px + rad) + 1):
+                if (gx - px) ** 2 + (gy - py) ** 2 > rad * rad:
+                    continue
+                im = _flood_tile(gx // 256, gy // 256)
+                if im is None:
+                    continue
+                c = im.getpixel((gx % 256, gy % 256))
+                if c[3]:
+                    best = max(best, FLOOD_CLASS.get(c[:3], 0))
+    except Exception as e:
+        print(f'  flood fail {q}: {e}')
+        return None
+    RIVER[q] = best
+    return best
+
+
 def main():
     raw = json.loads((D / 'listings_raw.json').read_text())
     rules = json.loads((D / 'static' / 'flood_rules.json').read_text())
@@ -159,6 +213,7 @@ def main():
         e, rel = geo_lookup(q, budget)
         g = GEO_IDX.get(q)  # 丁目-level point for the map
         la, lo = (None, None) if g is None or pd.isna(g.lat) else (round(float(g.lat), 6), round(float(g.lon), 6))
+        rv = river_depth(q, la, lo)
         e = None if e is None or pd.isna(e) else float(e)
         rel = None if rel is None or pd.isna(rel) else float(rel)
         town = nz(r.town or '')
@@ -188,12 +243,12 @@ def main():
             sm=None if a is None else int(a.supermarkets_n),
             sn='' if a is None or not isinstance(a.supermarkets_names, str) else re.split('[;、|]', a.supermarkets_names)[0].strip(),
             cl=None if a is None else int(a.clinics_n), pd=None if a is None else int(a.pediatric_n),
-            u=r.url, fs=first, la=la, lo=lo))
+            u=r.url, fs=first, la=la, lo=lo, rv=rv))
 
     current = {o['u'] for o in out}
     seen = {k: v for k, v in seen.items() if k in current}
     seen_path.write_text(json.dumps(seen, ensure_ascii=False, indent=0))
-    GEO.to_csv(GEO_PATH, index=False)
+    GEO.assign(river_cls=GEO.geo_q.map(RIVER).astype('Int64')).to_csv(GEO_PATH, index=False)
     (D / 'listings.json').write_text(json.dumps(out, ensure_ascii=False, indent=0, default=str))
 
     meta = dict(updated=raw['scraped'], total_scraped=len(raw['rows']), shown=len(out),

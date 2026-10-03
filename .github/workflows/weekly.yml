@@ -26,10 +26,10 @@ jobs:
     steps:
       # Check out the branch tip, not the triggering commit, so a run queued
       # behind another one starts from that run's data commit.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.ref }}
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -50,7 +50,7 @@ jobs:
           git diff --cached --quiet || git commit -m "Weekly data refresh $(date -u +%F)"
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
@@ -62,7 +62,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   # Runs after deploy so the site still updates, but marks the run red.
   scrape-status:

@@ -155,7 +155,10 @@ def main():
     out = []
     for r in df.itertuples():
         ch = '' if r.chome_no is None or pd.isna(r.chome_no) or r.chome_no > 20 else f'{int(r.chome_no)}丁目'
-        e, rel = geo_lookup(f'名古屋市{r.ward}{r.town}{ch}', budget)
+        q = f'名古屋市{r.ward}{r.town}{ch}'
+        e, rel = geo_lookup(q, budget)
+        g = GEO_IDX.get(q)  # 丁目-level point for the map
+        la, lo = (None, None) if g is None or pd.isna(g.lat) else (round(float(g.lat), 6), round(float(g.lon), 6))
         e = None if e is None or pd.isna(e) else float(e)
         rel = None if rel is None or pd.isna(rel) else float(rel)
         town = nz(r.town or '')
@@ -185,7 +188,7 @@ def main():
             sm=None if a is None else int(a.supermarkets_n),
             sn='' if a is None or not isinstance(a.supermarkets_names, str) else re.split('[;、|]', a.supermarkets_names)[0].strip(),
             cl=None if a is None else int(a.clinics_n), pd=None if a is None else int(a.pediatric_n),
-            u=r.url, fs=first))
+            u=r.url, fs=first, la=la, lo=lo))
 
     current = {o['u'] for o in out}
     seen = {k: v for k, v in seen.items() if k in current}
@@ -197,7 +200,11 @@ def main():
                 new=sum(1 for o in out if o['fs'] == today))
     OUT_DIR.mkdir(exist_ok=True)
     tpl = (ROOT / 'site' / 'template.html').read_text()
-    html = tpl.replace('__DATA__', json.dumps(out, ensure_ascii=False, default=str)).replace('__META__', json.dumps(meta, ensure_ascii=False))
+    st = pd.read_csv(D / 'static' / 'stations.csv')
+    stations = [[r.station, round(r.lat, 6), round(r.lng, 6)] for r in st.itertuples()]
+    html = (tpl.replace('__DATA__', json.dumps(out, ensure_ascii=False, default=str))
+              .replace('__META__', json.dumps(meta, ensure_ascii=False))
+              .replace('__STATIONS__', json.dumps(stations, ensure_ascii=False)))
     (OUT_DIR / 'index.html').write_text(html)
     (OUT_DIR / '.nojekyll').write_text('')
     print(meta)

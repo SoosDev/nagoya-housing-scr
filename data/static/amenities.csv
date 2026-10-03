@@ -1,0 +1,29 @@
+station,supermarkets_n,supermarkets_names,clinics_n,pediatric_n,drugstores_n,shops_n,notes
+覚王山,2,Frante Rose Kakuozan(115m); Pare Marche Ikeshita(580m),5,2,2,0,4 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+高岳,1,Maruki(368m),3,0,2,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+本山,1,MaxValu(97m),4,0,2,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+東山公園,1,Konomiya Higashiyama Branch(197m),2,1,0,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+桜山,1,Maxvalu(92m),5,0,1,2,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+一社,1,MaxValu(135m),5,1,2,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+八事,1,Frante Rose Yagoto(260m),2,0,2,1,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+自由ケ丘,1,MaxValu(54m),1,0,0,1,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+瑞穂運動場東,0,,3,1,2,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds; no supermarket found within 600m
+いりなか,1,Valor Takikawa(396m),3,1,2,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+星ケ丘,5,Hoshigaoka Terrace THE KITCHEN(66m); Grand Food Hall Hoshigaoka(71m); Lulubio epicerie Hoshigaoka(124m); Kitano Ace Mitsukoshi Hoshigaoka Store(156m),3,0,1,2,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+茶屋ケ坂,1,Konomiya(313m),3,1,1,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+名古屋大学,0,,0,0,0,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds; no supermarket found within 600m
+八事日赤,2,Feel(380m); Valor Takikawa(554m),5,1,0,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+塩釜口,1,Aoki(566m),2,0,1,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+総合リハビリセンター,0,,2,0,1,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds; no supermarket found within 600m
+瑞穂運動場西,3,Maxvalu Express Mizuho Undojo Nishiekizen Shop(82m); MaxValu Mizuhodori(380m); Yamanaka Mizuho(549m),4,1,3,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+池下,1,Pare Marche Ikeshita(66m),6,1,1,2,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+久屋大通,1,Kitsch et Bio Supermarket(241m),2,1,2,4,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+森下,1,名古屋市 徳川公設市場(519m),5,0,1,1,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+川名,3,Yaosen Kawaharatoriten(477m); MaxValu(551m); Yamanaka(564m),2,0,1,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+瑞穂区役所,1,Yamanaka Mizuho(480m),5,0,4,1,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+車道,1,Valor Kurumamichi Store(358m),4,0,3,1,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+御器所,1,MaxValu(353m),6,1,2,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+新瑞橋,3,MEGA Don Quijote UNY Aratama(205m); イオン新瑞橋店(351m); MaxValu Mizuhodori(451m),6,2,3,2,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+清水,2,ちゃふやさい(81m); Shirakabe Frante(477m),3,0,2,1,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+尼ケ坂,1,Shirakabe Frante(498m),4,1,2,1,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds
+上社,4,Maxvalu Express Kamiyashiro Ekimae Shop(95m); Coop Kamiyashiro Shop(168m); Feel(396m); Maxvalu Express Hongoekikita Shop(566m),3,1,1,0,1 search call(s); each query capped at 10 results (merged per call) so all counts are lower bounds

@@ -1,0 +1,158 @@
+<title>Nagoya Home Shortlist</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: summary strip, filter bar, then a dense card list (one column on phones, two on wide screens) */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --fg:#17201d; --muted:#5b6862; --line:#d9e0dc;
+  --accent:#1f6f5c; --accent-soft:#e2f0eb;
+  --ok:#2c7a4b; --ok-bg:#e3f3e8; --warn:#9a6a00; --warn-bg:#fbf0d5; --bad:#b03a2e; --bad-bg:#f9e1de;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111715; --surface:#19211e; --fg:#e4ebe7; --muted:#97a59e; --line:#2c3833;
+  --accent:#5cc2a4; --accent-soft:#1d3a31;
+  --ok:#6fcf93; --ok-bg:#1a3325; --warn:#e3b54a; --warn-bg:#3a2f12; --bad:#f08a7e; --bad-bg:#3d1f1b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111715; --surface:#19211e; --fg:#e4ebe7; --muted:#97a59e; --line:#2c3833;
+  --accent:#5cc2a4; --accent-soft:#1d3a31;
+  --ok:#6fcf93; --ok-bg:#1a3325; --warn:#e3b54a; --warn-bg:#3a2f12; --bad:#f08a7e; --bad-bg:#3d1f1b; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.55}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:18px}
+h1{font-size:1.5rem;margin:0;text-wrap:balance;letter-spacing:.01em}
+.sub{color:var(--muted);margin:4px 0 0;max-width:65ch}
+details{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+summary{cursor:pointer;font-weight:700}
+details p,details li{color:var(--fg);max-width:70ch}
+details ul{padding-left:1.2em;margin:6px 0}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-width:0}
+.stat b{font-family:var(--f-num);font-size:1.15rem;display:block}
+.stat span{color:var(--muted);font-size:12px}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+label{display:flex;flex-direction:column;gap:3px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:0}
+select,input{font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;text-transform:none;letter-spacing:0;min-width:0}
+select:focus,input:focus,a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.count{color:var(--muted);font-size:13px}
+.list{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:820px){.list{grid-template-columns:1fr 1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.price{font-family:var(--f-num);font-weight:500;font-size:1.2rem;white-space:nowrap}
+.name{font-weight:700;overflow-wrap:anywhere}
+.type{font-size:11px;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:1px 6px;margin-right:6px;white-space:nowrap}
+.facts{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted);font-size:13px}
+.facts b{color:var(--fg);font-weight:500;font-family:var(--f-num)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;border-radius:999px;padding:2px 9px;border:1px solid var(--line);white-space:nowrap}
+.chip.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.chip.warn{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.chip.new{background:var(--accent);color:var(--surface);border-color:transparent}
+.chip.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.reason{font-size:12px;color:var(--muted)}
+.foot{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;color:var(--muted);flex-wrap:wrap}
+a{color:var(--accent);font-weight:500}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.more{justify-self:center}
+button{font:inherit;color:var(--accent);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 16px;cursor:pointer}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Nagoya Home Shortlist</h1>
+    <p class="sub">SUUMO for-sale listings, updated weekly (last update <b id="upd"></b>), filtered to ≤10 min walk, used homes ≤25 years old, inside 12 frequently cited 中学校学区, with flood signals from the 8 Sept 2026 rain and hazard maps.</p>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <details>
+    <summary>How this was built and what to verify</summary>
+    <ul>
+      <li><b>Listings:</b> <span id="mTotal"></span> SUUMO listings in 千種・東・昭和・瑞穂・名東・天白 met the walk and age limits this week. <span id="mShown"></span> remain after keeping target school districts and merging duplicate agent ads. A refresh runs every Monday morning (JST). Prices and specs come from SUUMO list pages and are not re-checked against detail pages.</li>
+      <li><b>School district:</b> matched by 町名/丁目 against the city's official 通学区域 lists (as of 1 Sept 2026). Where the city marks a 番地-level split, two schools appear; confirm with the ward office. No official school ranking exists. The 12 districts are the ones repeatedly cited by real-estate sources.</li>
+      <li><b>Flood flag:</b> "Avoid" means the 町 is named in Sept 2026 damage reports or on the city hazard maps. "Caution" means partly on a map, next to 山崎川, below 10 m ground elevation, or more than 5 m below its immediate surroundings (GSI elevation data). "No flag found" only means research found nothing; it is not a clearance. Street-level damage locations from Sept 2026 were not published, so check each address on the city hazard map or 重ねるハザードマップ.</li>
+      <li><b>Ward damage:</b> homes damaged in the ward on 8 Sept 2026 (city figures as of 30 Sept). 昭和区 was hit hardest in the city.</li>
+      <li><b>Station amenities:</b> supermarkets and clinics within 600 m of the listed station, from Google Places. Counts are minimums.</li>
+    </ul>
+    <p>Hazard map: city.nagoya.jp/bousaiportal/hazardmap/1036428.html · disaportal.gsi.go.jp · School districts: city.nagoya.jp/kodomo/schools/1034352/1016772/1016777.html</p>
+  </details>
+
+  <div class="filters">
+    <label for="fType">Type<select id="fType"><option value="">All</option><option value="__new">New this week</option><option>中古マンション</option><option>新築マンション</option><option>中古一戸建て</option><option>新築一戸建て</option></select></label>
+    <label for="fFlood">Flood flag<select id="fFlood"><option value="nf">No flag only</option><option value="nfc" selected>Hide Avoid</option><option value="">All</option></select></label>
+    <label for="fJH">中学校学区<select id="fJH"><option value="">All</option></select></label>
+    <label for="fWard">Ward<select id="fWard"><option value="">All</option></select></label>
+    <label for="fRooms">Layout<select id="fRooms"><option value="">Any</option><option value="2">2+ bedrooms</option><option value="3">3+ bedrooms</option><option value="4">4+ bedrooms</option></select></label>
+    <label for="fMax">Max price (万円)<input id="fMax" type="number" inputmode="numeric" placeholder="No limit"></label>
+    <label for="fSort">Sort<select id="fSort">
+      <option value="score">Best match</option><option value="pa">Price ↑</option><option value="pd">Price ↓</option>
+      <option value="new">Newest</option><option value="area">Largest</option><option value="walk">Shortest walk</option><option value="elev">Highest ground</option></select></label>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div class="list" id="list"></div>
+  <button class="more" id="more" hidden>Show more</button>
+</div>
+
+<script>
+const DATA = __DATA__;
+const META = __META__;
+document.getElementById("upd").textContent = META.updated;
+document.getElementById("mTotal").textContent = META.total_scraped.toLocaleString();
+document.getElementById("mShown").textContent = META.shown.toLocaleString();
+const $ = id => document.getElementById(id);
+const uniq = a => [...new Set(a)].filter(Boolean).sort();
+uniq(DATA.flatMap(r => (r.tj||'').split('、'))).forEach(v => $('fJH').add(new Option(v, v)));
+uniq(DATA.map(r => r.w)).forEach(v => $('fWard').add(new Option(v, v)));
+const rooms = l => { const m = /(\d)/.exec(l || ''); return m ? +m[1] : 0; };
+const yen = p => p == null ? '価格未定' : (p >= 10000 ? (p/10000).toFixed(p % 10000 ? 2 : 0).replace(/\.?0+$/,'') + '億' : p.toLocaleString()) + '万円';
+const score = r => (r.f === 'No flag found' ? 30 : r.f === 'Caution' ? 10 : 0)
+  + Math.min(r.sm || 0, 3) * 4 + Math.min(r.cl || 0, 5) + (r.pd ? 3 : 0)
+  + (r.rl != null ? Math.max(Math.min(r.rl, 10), -10) * 0.5 : 0)
+  + (10 - (r.wk || 10)) * 0.6 + (r.by ? (r.by - 2001) * 0.2 : 0) - (r.wd || 0) / 25;
+DATA.forEach(r => r.s = score(r));
+let shown = 40;
+function filtered(){
+  const t = $('fType').value, fl = $('fFlood').value, jh = $('fJH').value, w = $('fWard').value,
+        rm = +$('fRooms').value || 0, mx = +$('fMax').value || Infinity, so = $('fSort').value;
+  const out = DATA.filter(r => (!t || (t === '__new' ? r.fs === META.updated : r.t === t))
+    && (fl === '' || (fl === 'nf' ? r.f === 'No flag found' : r.f !== 'Avoid'))
+    && (!jh || (r.tj || '').includes(jh)) && (!w || r.w === w)
+    && rooms(r.l) >= rm && (r.p == null ? mx === Infinity : r.p <= mx));
+  const k = {score:(a,b)=>b.s-a.s, pa:(a,b)=>(a.p??1e9)-(b.p??1e9), pd:(a,b)=>(b.p??-1)-(a.p??-1),
+    new:(a,b)=>(b.by??0)-(a.by??0), area:(a,b)=>(b.an??0)-(a.an??0), walk:(a,b)=>(a.wk??99)-(b.wk??99), elev:(a,b)=>(b.e??-99)-(a.e??-99)}[so];
+  return out.sort(k);
+}
+function chipFlood(r){
+  const c = r.f === 'Avoid' ? 'bad' : r.f === 'Caution' ? 'warn' : 'ok';
+  return `<span class="chip ${c}">${r.f}</span>` + (r.fs === META.updated ? ' <span class="chip new">New</span>' : '');
+}
+function card(r){
+  const age = r.by ? `${2026 - r.by}年` : (r.t.startsWith('新築') ? '新築' : '');
+  return `<article class="card">
+    <div class="top"><div class="name"><span class="type">${r.t}</span>${esc(r.n)}</div><div class="price">${r.pt && r.p == null ? esc(r.pt) : yen(r.p)}</div></div>
+    <div class="facts"><span><b>${esc(r.l)}</b></span><span><b>${esc(r.a)}</b>m²</span>${r.ld ? `<span>土地 <b>${esc(String(r.ld))}</b>m²</span>` : ''}<span>${r.b ? '築 <b>' + esc(r.b) + '</b>' : esc(age)}</span><span>${esc(r.st)} 徒歩<b>${r.wk ?? '?'}</b>分</span></div>
+    <div class="facts"><span>${esc(r.ad)}</span></div>
+    <div class="chips">${chipFlood(r)}<span class="chip">${esc(r.jh)}</span><span class="chip">${esc(r.es)}</span>
+      ${r.e != null ? `<span class="chip num">標高 ${r.e.toFixed(0)}m${r.rl != null ? ` (${r.rl >= 0 ? '+' : ''}${r.rl.toFixed(0)})` : ''}</span>` : ''}</div>
+    ${r.fr ? `<div class="reason">${esc(r.fr)}</div>` : ''}
+    <div class="foot"><span>駅周辺: スーパー ${r.sm ?? '?'}${r.sn ? ' · ' + esc(r.sn) : ''} · クリニック ${r.cl ?? '?'}${r.pd ? ' · 小児科 ' + r.pd : ''} · ${esc(r.w)} 9/8被害 ${r.wd ?? '?'}棟</span><a href="${r.u}" target="_blank" rel="noopener">SUUMO →</a></div>
+  </article>`;
+}
+function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function render(){
+  const f = filtered();
+  $('count').textContent = `${f.length} of ${DATA.length} listings`;
+  $('list').innerHTML = f.slice(0, shown).map(card).join('');
+  $('more').hidden = f.length <= shown;
+}
+function stats(){
+  const n = t => DATA.filter(r => r.t === t && r.f !== 'Avoid').length;
+  const s = [['中古マンション', n('中古マンション')], ['新築マンション', n('新築マンション')], ['中古一戸建て', n('中古一戸建て')], ['新築一戸建て', n('新築一戸建て')],
+    ['Flagged Avoid', DATA.filter(r => r.f === 'Avoid').length], ['New this week', META.new]];
+  $('stats').innerHTML = s.map(([k, v]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join('');
+}
+['fType','fFlood','fJH','fWard','fRooms','fMax','fSort'].forEach(id => $(id).addEventListener('input', () => { shown = 40; render(); }));
+$('more').addEventListener('click', () => { shown += 40; render(); });
+stats(); render();
+</script>

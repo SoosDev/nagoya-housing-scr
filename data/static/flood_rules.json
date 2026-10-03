@@ -1,0 +1,65 @@
+{
+  "_about": "Flood rules applied per town (町名). Sources: 名古屋市 9/8大雨 被害状況 (2026), 名古屋市 洪水・内水ハザードマップ, ward risk sheets. Edit by hand when new information appears.",
+  "avoid": {
+    "千種区": {
+      "星ケ丘": "On 洪水/内水 hazard map",
+      "星が丘元町": "星ケ丘 area on hazard map",
+      "自由ケ丘": "On 洪水/内水 hazard map",
+      "富士見台": "On hazard map",
+      "汁谷町": "Named water-collecting valley (ward risk sheet)",
+      "鍋屋上野町字汁谷": "汁谷 valley",
+      "末盛通": "末盛通 valley; flooded Sept 2026 east of 覚王山",
+      "東山通": "東山 area on hazard map",
+      "見附町": "見付 area on hazard map"
+    },
+    "昭和区": {
+      "滝川町": "山崎川 corridor + 内水 map",
+      "川原通": "山崎川 corridor + 内水 map"
+    }
+  },
+  "caution": {
+    "千種区": {
+      "姫池通": "Next to 末盛通 valley; intersection ~400 m east of 覚王山駅 flooded Sept 2026"
+    },
+    "昭和区": {
+      "伊勝町": "Partly on 内水 hazard map",
+      "広路町": "Partly on 内水 hazard map",
+      "広路町字梅園": "Partly on 内水 hazard map",
+      "広路町字隼人": "Partly on 内水 hazard map",
+      "広路町字石坂": "Partly on 内水 hazard map",
+      "五軒家町": "Partly on 内水 hazard map",
+      "駒方町": "Partly on 内水 hazard map",
+      "川原町": "Partly on 内水 hazard map",
+      "松栄町": "Partly on 内水 hazard map",
+      "御器所町": "Partly on 内水 hazard map",
+      "吹上町": "Partly on 内水 hazard map",
+      "鶴舞町": "Partly on 内水 hazard map"
+    },
+    "天白区": {
+      "表山": "Hazard-map readings disagreed",
+      "植田": "天白川 flood zone",
+      "原": "天白川 flood zone",
+      "平針": "天白川 flood zone",
+      "野並": "天白川 flood zone; 東海豪雨 hotspot"
+    },
+    "瑞穂区": {
+      "石川町": "Near 山崎川 (overtopped Sept 2026), inferred",
+      "川澄町": "Near 山崎川, inferred",
+      "駒場町": "Near 山崎川, inferred",
+      "洲雲町": "Near 山崎川, inferred",
+      "瑞穂通": "Near 山崎川, inferred"
+    },
+    "名東区": {
+      "石が根町": "Cars submerged Sept 2026 (NHK)",
+      "藤森西町": "Past flooding along 香流川",
+      "香流": "香流川 valley"
+    }
+  },
+  "low_ground_m": 10,
+  "local_low_spot_m": -5,
+  "ward_damage_2026_09": {
+    "昭和区": 100, "守山区": 97, "千種区": 50, "北区": 43, "中村区": 36, "西区": 33,
+    "名東区": 32, "東区": 29, "瑞穂区": 12, "中川区": 12, "天白区": 10, "港区": 6,
+    "南区": 5, "熱田区": 4, "中区": 2, "緑区": 1
+  }
+}

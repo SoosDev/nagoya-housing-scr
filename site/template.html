@@ -1,328 +1,635 @@
+<!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Nagoya Home Shortlist</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<title>East Nagoya home shortlist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap">
 <style>
-/* Layout: summary strip, filter bar, then a dense card list (one column on phones, two on wide screens) */
+/* Layout: header, filter bar, then list beside a map (desktop) or map above list (phone).
+   Colours borrow from Nagoya subway signage; the Higashiyama-line yellow marks the selected home. */
 :root{
-  --bg:#f3f5f4; --surface:#ffffff; --fg:#17201d; --muted:#5b6862; --line:#d9e0dc;
-  --accent:#1f6f5c; --accent-soft:#e2f0eb;
-  --ok:#2c7a4b; --ok-bg:#e3f3e8; --warn:#9a6a00; --warn-bg:#fbf0d5; --bad:#b03a2e; --bad-bg:#f9e1de;
-  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
-  --f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --ground:#E9EDF0; --panel:#FFFFFF; --ink:#17202E; --muted:#586375; --rule:#D3D9DF; --ctl:#C5CDD6;
+  --head:#17202E; --head-sub:#B9C3D0; --head-rule:#4A5870;
+  --sel:#FFF3C4; --sel-rule:#E3D59A; --yellow:#F5B700;
+  --pin:#2D4E86; --caution:#C46A12; --caution-text:#9A520C; --avoid:#B42318;
+  --f-ja:"BIZ UDPGothic","Hiragino Sans","Noto Sans JP",sans-serif;
+  --f-zh:"Noto Sans TC","BIZ UDPGothic",sans-serif;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#111715; --surface:#19211e; --fg:#e4ebe7; --muted:#97a59e; --line:#2c3833;
-  --accent:#5cc2a4; --accent-soft:#1d3a31;
-  --ok:#6fcf93; --ok-bg:#1a3325; --warn:#e3b54a; --warn-bg:#3a2f12; --bad:#f08a7e; --bad-bg:#3d1f1b; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#111715; --surface:#19211e; --fg:#e4ebe7; --muted:#97a59e; --line:#2c3833;
-  --accent:#5cc2a4; --accent-soft:#1d3a31;
-  --ok:#6fcf93; --ok-bg:#1a3325; --warn:#e3b54a; --warn-bg:#3a2f12; --bad:#f08a7e; --bad-bg:#3d1f1b; color-scheme:dark}
-body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.55}
-.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:18px}
-h1{font-size:1.5rem;margin:0;text-wrap:balance;letter-spacing:.01em}
-.sub{color:var(--muted);margin:4px 0 0;max-width:65ch}
-details{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
-summary{cursor:pointer;font-weight:700}
-details p,details li{color:var(--fg);max-width:70ch}
-details ul{padding-left:1.2em;margin:6px 0}
-.stats{display:flex;flex-wrap:wrap;gap:8px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-width:0}
-.stat b{font-family:var(--f-num);font-size:1.15rem;display:block}
-.stat span{color:var(--muted);font-size:12px}
-.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
-label{display:flex;flex-direction:column;gap:3px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:0}
-select,input{font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;text-transform:none;letter-spacing:0;min-width:0}
-select:focus,input:focus,a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.count{color:var(--muted);font-size:13px}
-.list{display:grid;grid-template-columns:1fr;gap:10px}
-@media (min-width:820px){.list{grid-template-columns:1fr 1fr}}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.price{font-family:var(--f-num);font-weight:500;font-size:1.2rem;white-space:nowrap}
-.name{font-weight:700;overflow-wrap:anywhere}
-.type{font-size:11px;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:1px 6px;margin-right:6px;white-space:nowrap}
-.facts{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted);font-size:13px}
-.facts b{color:var(--fg);font-weight:500;font-family:var(--f-num)}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font-size:12px;border-radius:999px;padding:2px 9px;border:1px solid var(--line);white-space:nowrap}
-.chip.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
-.chip.warn{background:var(--warn-bg);color:var(--warn);border-color:transparent}
-.chip.new{background:var(--accent);color:var(--surface);border-color:transparent}
-.chip.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
-.reason{font-size:12px;color:var(--muted)}
-.foot{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;color:var(--muted);flex-wrap:wrap}
-a{color:var(--accent);font-weight:500}
-.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
-.more{justify-self:center}
-button{font:inherit;color:var(--accent);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 16px;cursor:pointer}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-ja);font-size:14px;line-height:1.5}
+html[lang="zh-Hant"] body{font-family:var(--f-zh)}
+.ja{font-family:var(--f-ja)}
 [hidden]{display:none!important}
-/* List/Map switch and map view */
-.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.view{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
-.view button{border:0;border-radius:0;padding:5px 16px;color:var(--muted);background:transparent}
-.view button+button{border-left:1px solid var(--line)}
-.view button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:700}
-.mapwrap{position:relative;height:min(72vh,720px);min-height:420px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
-#map{position:absolute;inset:0}
-.legend{position:absolute;left:10px;bottom:10px;z-index:2;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;display:flex;flex-direction:column;gap:6px;max-width:calc(100% - 20px);box-shadow:0 2px 10px rgb(0 0 0 / .12)}
-.legend .row{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center}
-.legend label{flex-direction:row;align-items:center;gap:6px;font-size:12px;letter-spacing:0;text-transform:none;color:var(--fg);cursor:pointer}
-.legend input{padding:0;margin:0;accent-color:var(--accent)}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
-.dot.st{width:7px;height:7px;background:var(--surface);box-shadow:0 0 0 2px var(--fg)}
-.sw{display:inline-block;width:14px;height:10px;margin-right:4px;vertical-align:-1px;border-radius:2px}
-.depth{color:var(--muted);gap:4px 10px}
-.mapwrap .maplibregl-popup-content{background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:0;box-shadow:0 6px 24px rgb(0 0 0 / .18);font-family:var(--f-body)}
-.mapwrap .maplibregl-popup-anchor-top .maplibregl-popup-tip,.mapwrap .maplibregl-popup-anchor-top-left .maplibregl-popup-tip,.mapwrap .maplibregl-popup-anchor-top-right .maplibregl-popup-tip{border-bottom-color:var(--surface)}
-.mapwrap .maplibregl-popup-anchor-bottom .maplibregl-popup-tip,.mapwrap .maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,.mapwrap .maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip{border-top-color:var(--surface)}
-.mapwrap .maplibregl-popup-anchor-left .maplibregl-popup-tip{border-right-color:var(--surface)}
-.mapwrap .maplibregl-popup-anchor-right .maplibregl-popup-tip{border-left-color:var(--surface)}
-.mapwrap .maplibregl-popup-close-button{color:var(--muted);font-size:20px;padding:0 8px;z-index:1}
-.pop{width:min(360px,78vw);max-height:min(60vh,440px);overflow:auto}
-.pop .ph{padding:8px 34px 6px 14px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
-.pop .card{border:0;border-radius:0}
-.pop .card+.card{border-top:1px solid var(--line)}
-.mapwrap.dark .maplibregl-ctrl-group{background:var(--surface)}
-.mapwrap.dark .maplibregl-ctrl-group button+button{border-top-color:var(--line)}
-.mapwrap.dark .maplibregl-ctrl-icon{filter:invert(.9)}
-.mapwrap.dark .maplibregl-ctrl-attrib{background:rgb(25 33 30 / .85);color:var(--muted)}
-.mapwrap.dark .maplibregl-ctrl-attrib a{color:var(--muted)}
-.mapwrap.dark .maplibregl-ctrl-attrib-button{filter:invert(.9)}
-@media (max-width:819px){body.mapview .filters{position:static}}  /* sticky filters would cover the map on phones */
-.mapmsg{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted)}
-</style>
+button,select,input{font:inherit;color:inherit}
+a{color:var(--pin)}
+a:hover{color:var(--ink)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:1px}
+.muted{color:var(--muted)}
 
-<div class="wrap">
-  <header>
-    <h1>Nagoya Home Shortlist</h1>
-    <p class="sub">SUUMO for-sale listings, updated weekly (last update <b id="upd"></b>), filtered to ≤10 min walk, used homes ≤25 years old, inside 12 frequently cited 中学校学区, with flood signals from the 8 Sept 2026 rain and hazard maps.</p>
+/* app shell: on desktop the page itself never scrolls; the list does */
+.app{display:flex;flex-direction:column;min-height:100dvh}
+@media (min-width:1000px){.app{height:100dvh}}
+
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 24px;padding:12px 24px;background:var(--head);color:#fff}
+.brand{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 18px;min-width:0}
+.brand h1{margin:0;font-size:21px;line-height:1.3;letter-spacing:.02em}
+.brand p{margin:0;font-size:13px;color:var(--head-sub);max-width:72ch}
+.tools{display:flex;align-items:center;gap:10px}
+.seg{display:flex;border:1px solid var(--head-rule);border-radius:6px;overflow:hidden}
+.seg button{height:34px;padding:0 12px;border:0;background:transparent;color:#fff;font-weight:700;cursor:pointer}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink)}
+.ghost{height:36px;padding:0 14px;border-radius:6px;border:1px solid var(--head-rule);background:transparent;color:#fff;cursor:pointer}
+
+.filters{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px;padding:12px 24px 14px;background:var(--panel);border-bottom:1px solid var(--rule)}
+.types{display:flex;flex-wrap:wrap;border:1px solid var(--ctl);border-radius:6px;overflow:hidden}
+.types button{height:36px;padding:0 14px;border:0;border-left:1px solid var(--ctl);background:var(--panel);font-weight:700;cursor:pointer;white-space:nowrap}
+.types button:first-child{border-left:0}
+.types button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.types .n{font-weight:400;opacity:.75;margin-left:4px}
+.chip{height:38px;padding:0 14px;border:1px solid var(--ctl);border-radius:6px;background:var(--panel);font-weight:700;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--yellow);border-color:var(--yellow)}
+.chip .n{font-weight:400;margin-left:4px}
+.more{display:contents}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.fld select,.fld input{height:36px;padding:0 8px;border:1px solid var(--ctl);border-radius:6px;background:var(--panel);color:var(--ink);font-size:14px;min-width:0}
+.fld input{width:124px}
+.filterBtn{display:none}
+
+.split{flex:1 1 auto;min-height:0;display:flex}
+.listpane{flex:0 0 460px;min-width:0;display:flex;flex-direction:column;background:var(--panel);border-right:1px solid var(--rule)}
+.listhead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 20px;border-bottom:1px solid var(--rule)}
+.listhead .count{font-weight:700}
+.listhead .count .muted{font-weight:400;margin-left:10px}
+.listhead label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.listhead select{height:32px;padding:0 6px;border:1px solid var(--ctl);border-radius:6px;background:var(--panel);color:var(--ink);font-size:13px}
+.list{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}
+.empty{padding:28px 20px;color:var(--muted)}
+.moreBtn{display:block;margin:16px auto 24px;height:40px;padding:0 18px;border:1px solid var(--ctl);border-radius:6px;background:var(--panel);font-weight:700;cursor:pointer}
+
+/* one listing */
+.row{border-bottom:1px solid var(--rule);background:var(--panel)}
+.row.sel{background:var(--sel)}
+.rowbtn{display:block;width:100%;padding:16px 20px 18px;border:0;background:transparent;text-align:left;cursor:pointer}
+.row:not(.sel) .rowbtn:hover{background:#F6F8FA}
+.rowbtn>span{display:flex;flex-wrap:wrap;align-items:center}
+.r1{justify-content:space-between;align-items:baseline!important;gap:12px}
+.price{display:flex;align-items:baseline;gap:2px}
+.price b{font-size:26px;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.price small{font-size:14px;font-weight:700}
+.ptype{font-size:12px;color:var(--muted);white-space:nowrap}
+.name{display:block!important;margin-top:2px;font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.facts{gap:4px 14px;margin-top:6px}
+.newtag{padding:1px 8px;border-radius:4px;background:var(--yellow);font-size:12px;font-weight:700}
+.where{gap:6px 14px;margin-top:8px}
+.stn{display:inline-flex;align-items:center;gap:4px}
+.ln{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 3px;border-radius:4px;font-size:12px;font-weight:700;color:#fff;font-family:var(--f-ja)}
+.ln-H{background:#F5B700;color:var(--ink)}.ln-M{background:#7A4FA0}.ln-T{background:#0072BC}.ln-S{background:#D8262E}.ln-ST{background:#8A9099}
+.risk{gap:6px 16px;margin-top:8px;font-size:13px}
+.flag{display:inline-flex;align-items:center;gap:6px}
+.mk{display:inline-block;width:10px;height:10px;flex:none;border:2px solid var(--muted);background:#fff}
+.mk.caution{border:0;background:var(--caution)}
+.mk.avoid{border:0;background:var(--avoid)}
+.mk.unknown{border-style:dashed}
+.rv-2{color:var(--caution-text);font-weight:700}
+.rv-3{color:var(--avoid);font-weight:700}
+.rv-0,.rv-1,.rv-x{color:var(--muted)}
+.details{padding:0 20px 18px}
+.details dl{display:grid;grid-template-columns:132px minmax(0,1fr);gap:8px 12px;margin:0;padding-top:14px;border-top:1px solid var(--sel-rule);font-size:13px}
+.details dt{color:var(--muted)}
+.details dd{margin:0;overflow-wrap:anywhere}
+.links{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px}
+.btn{display:inline-flex;align-items:center;height:40px;padding:0 16px;border-radius:6px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer}
+.btn.primary{background:var(--ink);color:#fff;border:0}
+.btn.primary:hover{color:#fff;background:#2B3850}
+.btn.secondary{background:var(--panel);color:var(--ink);border:1px solid var(--ctl)}
+.alts{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:13px;color:var(--muted)}
+.alts a{display:inline-grid;place-items:center;min-width:28px;height:28px;border:1px solid var(--ctl);border-radius:4px;text-decoration:none;color:var(--ink)}
+.showmap{display:none}
+
+/* map */
+.mappane{flex:1 1 auto;min-width:0;position:relative;background:#E2E7EB}
+#map{position:absolute;inset:0}
+.legend{position:absolute;left:16px;bottom:16px;z-index:2;max-width:calc(100% - 32px);display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:8px;background:var(--panel);border:1px solid var(--ctl);font-size:12px}
+.legend .row1{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+.legend .it{display:inline-flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:50%;border:2px solid #fff}
+.dot.p{background:var(--pin);box-shadow:0 0 0 1px var(--pin)}
+.dot.c{background:var(--caution);box-shadow:0 0 0 1px var(--caution)}
+.dot.a{background:var(--avoid);box-shadow:0 0 0 1px var(--avoid)}
+.dot.s{width:10px;height:10px;background:#fff;border-color:var(--ink)}
+.track{width:22px;height:0;border-top:2px dashed var(--ink);opacity:.6}
+.legend label{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+.legend input{width:18px;height:18px;margin:0;accent-color:var(--ink)}
+.depth{display:flex;flex-wrap:wrap;gap:4px 12px;color:var(--muted)}
+.sw{display:inline-block;width:14px;height:10px;margin-right:4px;vertical-align:-1px}
+.mapmsg{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--muted)}
+.stn-mk{display:flex;align-items:center;gap:3px;pointer-events:none}
+.stn-mk i{width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--ink);flex:none}
+.stn-mk .ln{min-width:16px;height:16px;font-size:10px;border-radius:3px}
+.stn-mk b{font-size:12px;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff}
+.zoomed-out .stn-mk .ln,.zoomed-out .stn-mk b{display:none}
+.price-mk{padding:4px 8px;border-radius:4px;background:var(--ink);color:#fff;font-size:13px;font-weight:700;white-space:nowrap;pointer-events:none;font-family:var(--f-ja)}
+.maplibregl-ctrl-group button{width:36px;height:36px}
+
+dialog{max-width:min(720px,calc(100vw - 32px));max-height:calc(100dvh - 48px);padding:0;border:1px solid var(--ctl);border-radius:10px;color:var(--ink)}
+dialog::backdrop{background:rgb(23 32 46 / .45)}
+.dlg{padding:22px 26px 24px}
+.dlg h2{margin:0 0 12px;font-size:19px}
+.dlg h3{margin:18px 0 4px;font-size:15px}
+.dlg p{margin:0 0 6px;max-width:68ch}
+.dlg .close{float:right;height:36px;padding:0 14px;border:1px solid var(--ctl);border-radius:6px;background:var(--panel);cursor:pointer}
+
+/* phone and narrow tablet: map on top, list below, filters behind a button */
+@media (max-width:999px){
+  .top{padding:10px 16px}
+  .brand h1{font-size:18px}
+  .filters{padding:10px 16px;gap:10px}
+  .types{flex-wrap:nowrap;overflow-x:auto;max-width:100%;border:0;gap:8px;border-radius:0}
+  .types button{height:36px;border:1px solid var(--ctl);border-radius:18px}
+  .types button:first-child{border-left:1px solid var(--ctl)}
+  .filterBtn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 12px;border:1px solid var(--ctl);border-radius:6px;background:var(--panel);font-weight:700;cursor:pointer}
+  .filterBtn .badge{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:10px;background:var(--yellow);font-size:12px}
+  .more{display:none}
+  .more.open{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%}
+  .fld input{width:100%}
+  .split{flex-direction:column}
+  .mappane{order:-1;flex:none;height:46vh;min-height:300px;border-bottom:1px solid var(--rule)}
+  .listpane{flex:none;border-right:0}
+  .list{overflow:visible}
+  .listhead{padding:10px 16px}
+  .rowbtn{padding:14px 16px 16px}
+  .details{padding:0 16px 16px}
+  .details dl{grid-template-columns:104px minmax(0,1fr)}
+  .showmap{display:inline-flex}
+  .legend{left:8px;bottom:8px;padding:8px 10px;gap:6px}
+  .legend .row1 .opt{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1 data-i="title"></h1>
+      <p id="sub"></p>
+    </div>
+    <div class="tools">
+      <div class="seg" role="group" id="langs" data-i-aria="language">
+        <button type="button" data-lang="en" lang="en">EN</button><button type="button" data-lang="zh" lang="zh-Hant">繁中</button>
+      </div>
+      <button type="button" class="ghost" id="aboutBtn" data-i="about"></button>
+    </div>
   </header>
 
-  <div class="stats" id="stats"></div>
-
-  <details>
-    <summary>How this was built and what to verify</summary>
-    <ul>
-      <li><b>Listings:</b> <span id="mTotal"></span> SUUMO listings in 千種・東・昭和・瑞穂・名東・天白 met the walk and age limits this week. <span id="mShown"></span> remain after keeping target school districts and merging duplicate agent ads. A refresh runs every Monday morning (JST). Prices and specs come from SUUMO list pages and are not re-checked against detail pages.</li>
-      <li><b>School district:</b> matched by 町名/丁目 against the city's official 通学区域 lists (as of 1 Sept 2026). Where the city marks a 番地-level split, two schools appear; confirm with the ward office. No official school ranking exists. The 12 districts are the ones repeatedly cited by real-estate sources.</li>
-      <li><b>Flood flag:</b> "Avoid" means the 町 is named in Sept 2026 damage reports or on the city hazard maps. "Caution" means partly on a map, next to 山崎川, below 10 m ground elevation, or more than 5 m below its immediate surroundings (GSI elevation data). "No flag found" only means research found nothing; it is not a clearance. Street-level damage locations from Sept 2026 were not published, so check each address on the city hazard map or 重ねるハザードマップ.</li>
-      <li><b>River flood depth:</b> the deepest depth on GSI's 洪水浸水想定区域 (想定最大規模) within 100 m of the listing's 丁目 point. The point is approximate, so check the exact address. It does not cover inland rain flooding (内水); GSI publishes no 内水 data for these wards. "Elevation unknown" means the GSI elevation lookup failed, so the low-ground checks behind the flood flag did not run.</li>
-      <li><b>Ward damage:</b> homes damaged in the ward on 8 Sept 2026 (city figures as of 30 Sept). 昭和区 was hit hardest in the city.</li>
-      <li><b>Map:</b> pins sit at the 丁目 point from GSI address search, not at the building, so listings in the same 丁目 share one pin. The flood layer is GSI's 洪水浸水想定区域 (想定最大規模, river flooding). It does not cover inland rain flooding (内水) such as the 8 Sept 2026 damage; use the city hazard map for that.</li>
-      <li><b>Station amenities:</b> supermarkets and clinics within 600 m of the listed station, from Google Places. Counts are minimums.</li>
-    </ul>
-    <p>Hazard map: city.nagoya.jp/bousaiportal/hazardmap/1036428.html · disaportal.gsi.go.jp · School districts: city.nagoya.jp/kodomo/schools/1034352/1016772/1016777.html</p>
-  </details>
-
   <div class="filters">
-    <label for="fType">Type<select id="fType"><option value="">All</option><option value="__new">New this week</option><option>中古マンション</option><option>新築マンション</option><option>中古一戸建て</option><option>新築一戸建て</option></select></label>
-    <label for="fFlood">Flood flag<select id="fFlood"><option value="nf">No flag only</option><option value="nfc" selected>Hide Avoid</option><option value="">All</option></select></label>
-    <label for="fRiver">River flood<select id="fRiver"><option value="">Any</option><option value="0">None mapped</option><option value="1">Under 0.5 m</option><option value="2">Under 3 m</option></select></label>
-    <label for="fJH">中学校学区<select id="fJH"><option value="">All</option></select></label>
-    <label for="fWard">Ward<select id="fWard"><option value="">All</option></select></label>
-    <label for="fRooms">Layout<select id="fRooms"><option value="">Any</option><option value="2">2+ bedrooms</option><option value="3">3+ bedrooms</option><option value="4">4+ bedrooms</option></select></label>
-    <label for="fMax">Max price (万円)<input id="fMax" type="number" inputmode="numeric" placeholder="No limit"></label>
-    <label for="fSort">Sort<select id="fSort">
-      <option value="score">Best match</option><option value="pa">Price ↑</option><option value="pd">Price ↓</option>
-      <option value="new">Newest</option><option value="area">Largest</option><option value="walk">Shortest walk</option><option value="elev">Highest ground</option></select></label>
-  </div>
-
-  <div class="bar">
-    <div class="count" id="count"></div>
-    <div class="view" role="group" aria-label="View"><button type="button" id="vList" aria-pressed="true">List</button><button type="button" id="vMap" aria-pressed="false">Map</button></div>
-  </div>
-  <div class="mapwrap" id="mapWrap" hidden>
-    <div id="map"></div>
-    <div class="legend">
-      <div class="row"><span><i class="dot" style="background:var(--ok)"></i>No flag found</span><span><i class="dot" style="background:var(--warn)"></i>Caution</span><span><i class="dot" style="background:var(--bad)"></i>Avoid</span><span><i class="dot st"></i>Station</span></div>
-      <label for="fFloodMap"><input type="checkbox" id="fFloodMap">River flood depth (洪水浸水想定, max scale)</label>
-      <div class="row depth" id="depth" hidden><span><i class="sw" style="background:#f7f5a9"></i>&lt;0.5m</span><span><i class="sw" style="background:#ffd8c0"></i>0.5–3m</span><span><i class="sw" style="background:#ffb7b7"></i>3–5m</span><span><i class="sw" style="background:#ff9191"></i>5–10m</span><span><i class="sw" style="background:#f285c9"></i>10m+</span></div>
+    <div class="types" role="group" id="types" data-i-aria="typeLabel"></div>
+    <button type="button" class="chip" id="fNew" aria-pressed="false"><span data-i="newOnly"></span><span class="n" id="newN"></span></button>
+    <button type="button" class="filterBtn" id="filterBtn" aria-expanded="false" aria-controls="more">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 4h12M4.5 8h7M7 12h2"/></svg>
+      <span data-i="filters"></span><span class="badge" id="activeN" hidden></span>
+    </button>
+    <div class="more" id="more">
+      <label class="fld"><span data-i="flood"></span><select id="fFlood"></select></label>
+      <label class="fld"><span data-i="river"></span><select id="fRiver"></select></label>
+      <label class="fld"><span data-i="school"></span><select id="fJH"></select></label>
+      <label class="fld"><span data-i="ward"></span><select id="fWard"></select></label>
+      <label class="fld"><span data-i="bedrooms"></span><select id="fRooms"></select></label>
+      <label class="fld"><span data-i="maxPrice"></span><input id="fMax" type="number" inputmode="numeric" min="0" step="100" data-i-ph="noLimit"></label>
     </div>
   </div>
-  <div class="list" id="list"></div>
-  <button class="more" id="more" hidden>Show more</button>
+
+  <main class="split">
+    <section class="listpane" aria-labelledby="count">
+      <div class="listhead">
+        <span class="count" id="count" aria-live="polite"></span>
+        <label><span data-i="sort"></span><select id="fSort"></select></label>
+      </div>
+      <div class="list" id="list"></div>
+    </section>
+    <section class="mappane" id="mapPane" data-i-aria="map">
+      <div id="map"></div>
+      <div class="legend">
+        <div class="row1">
+          <span class="it"><i class="dot p"></i><span data-i="fNone"></span></span>
+          <span class="it"><i class="dot c"></i><span data-i="fCaution"></span></span>
+          <span class="it" id="lgAvoid" hidden><i class="dot a"></i><span data-i="fAvoid"></span></span>
+          <span class="it opt"><i class="dot s"></i><span data-i="station"></span></span>
+          <span class="it opt"><i class="track"></i><span data-i="subway"></span></span>
+        </div>
+        <label><input type="checkbox" id="fFloodMap"><span data-i="showFlood"></span></label>
+        <div class="depth" id="depth" hidden>
+          <span><i class="sw" style="background:#f7f5a9"></i><span data-i="lg1"></span></span>
+          <span><i class="sw" style="background:#ffd8c0"></i><span data-i="lg2"></span></span>
+          <span><i class="sw" style="background:#ffb7b7"></i><span data-i="lg3"></span></span>
+          <span><i class="sw" style="background:#ff9191"></i><span data-i="lg4"></span></span>
+          <span><i class="sw" style="background:#f285c9"></i><span data-i="lg5"></span></span>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>
+
+<dialog id="about" aria-labelledby="aboutTitle">
+  <div class="dlg">
+    <form method="dialog"><button class="close" data-i="close"></button></form>
+    <h2 id="aboutTitle" data-i="about"></h2>
+    <div id="aboutBody"></div>
+  </div>
+</dialog>
 
 <script>
 const DATA = __DATA__;
 const META = __META__;
-document.getElementById("upd").textContent = META.updated;
-document.getElementById("mTotal").textContent = META.total_scraped.toLocaleString();
-document.getElementById("mShown").textContent = META.shown.toLocaleString();
+const STATIONS = __STATIONS__;
 const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ja = s => `<span class="ja" lang="ja">${esc(s)}</span>`;
+const THIS_YEAR = new Date().getFullYear();
+
+// Nagoya subway (and Meitetsu Seto line) service per station, for the line badges.
+const LINE_OF = {'覚王山':['H'],'本山':['H','M'],'東山公園':['H'],'桜山':['S'],'一社':['H'],'八事':['M','T'],'自由ケ丘':['M'],'瑞穂運動場東':['M'],'いりなか':['T'],'星ケ丘':['H'],'茶屋ケ坂':['M'],'名古屋大学':['M'],'八事日赤':['M'],'塩釜口':['T'],'総合リハビリセンター':['M'],'瑞穂運動場西':['S'],'池下':['H'],'久屋大通':['M','S'],'森下':['ST'],'川名':['T'],'瑞穂区役所':['S'],'車道':['S'],'御器所':['T','S'],'新瑞橋':['S','M'],'清水':['ST'],'尼ケ坂':['ST'],'上社':['H'],'高岳':['S']};
+const badges = st => (LINE_OF[st] || []).map(k => `<span class="ln ln-${k}">${k}</span>`).join('');
+const TYPES = ['中古マンション', '新築マンション', '中古一戸建て', '新築一戸建て'];
+
+const I18N = {
+  en: {
+    code: 'en', title: 'East Nagoya home shortlist', language: 'Language', about: 'About the data', close: 'Close',
+    sub: (n, d) => `${n} homes for sale within 10 minutes of a station, in 12 school districts. Refreshed every Monday; last update ${d}.`,
+    date: d => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}),
+    typeLabel: 'Property type', all: 'All', newOnly: 'New this week', filters: 'Filters',
+    flood: 'Flood flag', hideAvoid: 'Hide Avoid', noFlagOnly: 'No flag only', showAll: n => `Show all (incl. ${n} Avoid)`,
+    river: 'River flood', anyDepth: 'Any depth', noneMapped: 'None mapped', under05: 'Under 0.5 m', under3: 'Under 3 m',
+    school: 'School district', allDistricts: n => `All ${n} districts`, ward: 'Ward', allWards: 'All wards',
+    bedrooms: 'Bedrooms', any: 'Any', bedN: n => `${n} or more`, maxPrice: 'Max price (万円)', noLimit: 'No limit',
+    sort: 'Sort', sBest: 'Best match', sPriceUp: 'Price, low to high', sPriceDown: 'Price, high to low', sNew: 'Newest building', sLargest: 'Largest', sWalk: 'Shortest walk', sHigh: 'Highest ground',
+    count: n => `${n} homes`, noLoc: n => `${n} not on the map`, empty: 'No homes match these filters. Loosen the flood or price filter to see more.', more: 'Show more',
+    walk: m => `${m} min walk`, district: 'district', built: y => `Built ${y}`, newBuild: 'New build', ready: y => `Ready ${y}`, land: 'Land', isNew: 'New',
+    fNone: 'No flag found', fNoneUnknown: 'No flag found, elevation unknown', fCaution: 'Caution', fAvoid: 'Avoid',
+    rivers: ['No river flood mapped within 100 m', 'River flood under 0.5 m nearby', 'River flood 0.5 to 3 m nearby', 'River flood 3 to 5 m nearby', 'River flood 5 to 10 m nearby', 'River flood 10 m or more nearby'],
+    rUnknown: 'River flood unknown', ads: n => `Listed by ${n} agents`,
+    dAddress: 'Address', dSchools: 'Schools', dElev: 'Ground elevation', dWhy: 'Flag reason', dNear: 'Near the station', dWard: 'Ward damage, 8 Sept 2026',
+    elev: e => `${e.toFixed(0)} m above sea level`, rel: r => Math.abs(r) < 0.5 ? ', about level with its surroundings' : r > 0 ? `, ${r.toFixed(0)} m above its surroundings` : `, ${(-r).toFixed(0)} m below its surroundings`, elevUnknown: 'Unknown (elevation lookup failed)',
+    whyNone: 'Not in damage reports or hazard-map town lists, and the ground is not low.', whyUnchecked: 'Not in damage reports or hazard-map town lists. Elevation is unknown, so the low-ground checks did not run.',
+    whyLow: n => `Low ground (${n} m); check the river and storm-surge hazard map`, whyLowSpot: n => `Local low spot (about ${n} m below its surroundings)`,
+    near: (sm, sn, cl, pd) => `${sm ?? '?'} supermarkets${sn ? ` (nearest: ${sn})` : ''}, ${cl ?? '?'} clinics${pd ? `, ${pd} pediatric` : ''}`,
+    wardDamage: (w, n) => `${n} homes damaged in ${w}`,
+    openSuumo: 'Open on SUUMO', otherAds: 'Other agents’ ads', showOnMap: 'Show on map',
+    map: 'Map', station: 'Station', subway: 'Subway track', showFlood: 'Show river flood depth (GSI, max scale)',
+    lg1: 'under 0.5 m', lg2: '0.5 to 3 m', lg3: '3 to 5 m', lg4: '5 to 10 m', lg5: '10 m or more',
+    mapFail: 'The map could not load. Check your connection and reload the page.',
+    aboutHtml: `
+<h3>Listings</h3><p>For-sale homes from SUUMO list pages in 千種・東・昭和・瑞穂・名東・天白, at most a 10-minute walk from a station, and used homes at most 25 years old. A refresh runs every Monday morning (JST). Prices and specs come from SUUMO list pages and are not checked against detail pages.</p>
+<h3>One card per home</h3><p>Ads from different agents for the same home are merged when the type, 丁目, price and floor area match (and land area, for houses). The card links every agent's ad. Two genuinely separate units with identical price and size in the same 丁目 would also merge.</p>
+<h3>School district</h3><p>Matched by 町名 and 丁目 against the city's official 通学区域 lists (as of 1 Sept 2026). Where the city splits a 丁目 by 番地, two schools appear; confirm with the ward office. The 12 districts are the ones real-estate sources cite most; no official ranking exists.</p>
+<h3>Flood flag</h3><p>“Avoid”: the 町 is named in Sept 2026 damage reports or on the city hazard maps. “Caution”: partly on a map, next to 山崎川, below 10 m ground elevation, or more than 5 m below its immediate surroundings (GSI elevation). “No flag found” only means the research found nothing; it is not a clearance. “Elevation unknown” means the GSI lookup failed, so the low-ground checks did not run.</p>
+<h3>River flood depth</h3><p>The deepest depth on GSI's 洪水浸水想定区域 (想定最大規模) within 100 m of the listing's 丁目 point. It does not cover inland rain flooding (内水), which caused the 8 Sept 2026 damage; GSI publishes no 内水 data for these wards. Check each address on the <a href="https://www.city.nagoya.jp/bousaiportal/hazardmap/1036428.html" target="_blank" rel="noopener">city hazard map</a> or <a href="https://disaportal.gsi.go.jp/" target="_blank" rel="noopener">重ねるハザードマップ</a>.</p>
+<h3>Map</h3><p>Pins sit at the 丁目 point from GSI address search, not at the building, so homes in the same 丁目 share a pin. Subway tracks come from OpenStreetMap.</p>
+<h3>Ward damage and station amenities</h3><p>Ward damage is the number of homes damaged in the ward on 8 Sept 2026 (city figures as of 30 Sept). Supermarkets and clinics are counted within 600 m of the listed station from Google Places; counts are minimums.</p>`
+  },
+  zh: {
+    code: 'zh-Hant', title: '名古屋東部購屋候選清單', language: '語言', about: '資料說明', close: '關閉',
+    sub: (n, d) => `共 ${n} 間待售住宅，距車站步行 10 分鐘內，位於 12 個國中學區。每週一更新，最後更新：${d}。`,
+    date: d => { const [y, m, dd] = d.split('-').map(Number); return `${y} 年 ${m} 月 ${dd} 日`; },
+    typeLabel: '物件類型', all: '全部', newOnly: '本週新物件', filters: '篩選',
+    flood: '淹水標記', hideAvoid: '隱藏「避開」', noFlagOnly: '僅顯示無標記', showAll: n => `全部顯示（含 ${n} 間「避開」）`,
+    river: '河川淹水', anyDepth: '不限深度', noneMapped: '無淹水預測', under05: '0.5 公尺以下', under3: '3 公尺以下',
+    school: '國中學區', allDistricts: n => `全部 ${n} 個學區`, ward: '行政區', allWards: '全部行政區',
+    bedrooms: '房數', any: '不限', bedN: n => `${n} 房以上`, maxPrice: '價格上限（萬日圓）', noLimit: '不限',
+    sort: '排序', sBest: '最佳符合', sPriceUp: '價格由低到高', sPriceDown: '價格由高到低', sNew: '屋齡最新', sLargest: '面積最大', sWalk: '步行最短', sHigh: '地勢最高',
+    count: n => `共 ${n} 間`, noLoc: n => `${n} 間未顯示於地圖`, empty: '沒有符合條件的物件。請放寬淹水或價格條件。', more: '顯示更多',
+    walk: m => `步行 ${m} 分鐘`, district: '學區', built: y => `${y} 年建`, newBuild: '新成屋', ready: y => `${y} 年完工`, land: '土地', isNew: '新物件',
+    fNone: '未發現標記', fNoneUnknown: '未發現標記（海拔不明）', fCaution: '注意', fAvoid: '避開',
+    rivers: ['100 公尺內無河川淹水預測', '附近河川淹水 0.5 公尺以下', '附近河川淹水 0.5–3 公尺', '附近河川淹水 3–5 公尺', '附近河川淹水 5–10 公尺', '附近河川淹水 10 公尺以上'],
+    rUnknown: '河川淹水不明', ads: n => `${n} 家仲介刊登`,
+    dAddress: '地址', dSchools: '學校', dElev: '地面海拔', dWhy: '標記原因', dNear: '車站周邊', dWard: '2026 年 9 月 8 日區內災損',
+    elev: e => `海拔 ${e.toFixed(0)} 公尺`, rel: r => Math.abs(r) < 0.5 ? '，與周邊大致同高' : r > 0 ? `，比周邊高 ${r.toFixed(0)} 公尺` : `，比周邊低 ${(-r).toFixed(0)} 公尺`, elevUnknown: '不明（海拔查詢失敗）',
+    whyNone: '未列於災損報告或災害地圖的町名清單，且地勢不低。', whyUnchecked: '未列於災損報告或災害地圖的町名清單。海拔不明，因此未進行低窪檢查。',
+    whyLow: n => `地勢低（${n} 公尺），請查看河川與暴潮災害地圖`, whyLowSpot: n => `局部低窪（比周邊低約 ${n} 公尺）`,
+    near: (sm, sn, cl, pd) => `超市 ${sm ?? '?'} 間${sn ? `（最近：${sn}）` : ''}，診所 ${cl ?? '?'} 間${pd ? `，小兒科 ${pd} 間` : ''}`,
+    wardDamage: (w, n) => `${w}受損住宅 ${n} 棟`,
+    openSuumo: '在 SUUMO 查看', otherAds: '其他仲介的廣告', showOnMap: '在地圖上顯示',
+    map: '地圖', station: '車站', subway: '地鐵路線', showFlood: '顯示河川淹水深度（國土地理院，最大規模）',
+    lg1: '0.5 公尺以下', lg2: '0.5–3 公尺', lg3: '3–5 公尺', lg4: '5–10 公尺', lg5: '10 公尺以上',
+    mapFail: '地圖無法載入。請檢查網路連線後重新整理頁面。',
+    aboutHtml: `
+<h3>物件來源</h3><p>來自 SUUMO 列表頁的待售住宅，範圍為千種・東・昭和・瑞穂・名東・天白區，距車站步行 10 分鐘內，中古屋屋齡 25 年以內。每週一早上（日本時間）更新。價格與規格取自 SUUMO 列表頁，未與詳細頁核對。</p>
+<h3>同一物件合併為一張卡片</h3><p>不同仲介刊登的同一物件，若類型、丁目、價格與建物面積（獨棟另加土地面積）相同，即合併為一張卡片，並附上每家仲介的廣告連結。同一丁目內價格與面積完全相同的不同戶也會被合併。</p>
+<h3>學區</h3><p>依町名與丁目比對名古屋市官方的通學區域清單（2026 年 9 月 1 日版）。若同一丁目依番地分屬不同學校，會顯示兩所學校，請向區公所確認。這 12 個學區是不動產資料最常提及的學區，並無官方排名。</p>
+<h3>淹水標記</h3><p>「避開」：該町出現在 2026 年 9 月的災損報告或市府災害地圖上。「注意」：部分位於災害地圖範圍、緊鄰山崎川、地面海拔低於 10 公尺，或比周邊低 5 公尺以上（國土地理院海拔資料）。「未發現標記」僅代表調查未發現問題，並非安全保證。「海拔不明」代表國土地理院查詢失敗，未進行低窪檢查。</p>
+<h3>河川淹水深度</h3><p>以物件所在丁目的座標為中心，100 公尺範圍內國土地理院「洪水浸水想定區域（想定最大規模）」的最大深度。不包含造成 2026 年 9 月 8 日災損的內水（雨水）淹水；國土地理院未提供這些區的內水資料。請在<a href="https://www.city.nagoya.jp/bousaiportal/hazardmap/1036428.html" target="_blank" rel="noopener">名古屋市災害地圖</a>或<a href="https://disaportal.gsi.go.jp/" target="_blank" rel="noopener">重ねるハザードマップ</a>確認每個地址。</p>
+<h3>地圖</h3><p>圖釘位於國土地理院地址搜尋得到的丁目座標，並非建物位置，因此同一丁目的物件共用一個圖釘。地鐵路線來自 OpenStreetMap。</p>
+<h3>區內災損與車站周邊</h3><p>區內災損為 2026 年 9 月 8 日該區受損住宅數（市府 9 月 30 日統計）。超市與診所為 Google Places 中距車站 600 公尺內的數量，實際可能更多。</p>`
+  }
+};
+let LANG = 'en';
+try { LANG = localStorage.getItem('lang') || ''; } catch (e) {}
+if (!I18N[LANG]) LANG = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+const T = () => I18N[LANG];
+
+DATA.forEach((r, i) => {
+  r.id = i;
+  r.k = r.la == null ? null : r.la + ',' + r.lo;
+  r.s = (r.f === 'No flag found' ? 30 : r.f === 'Caution' ? 10 : 0)
+    + Math.min(r.sm || 0, 3) * 4 + Math.min(r.cl || 0, 5) + (r.pd ? 3 : 0)
+    + (r.rl != null ? Math.max(Math.min(r.rl, 10), -10) * 0.5 : 0)
+    + (10 - (r.wk || 10)) * 0.6 + (r.by ? (r.by - 2001) * 0.2 : 0) - (r.wd || 0) / 25;
+});
+const NEW = DATA.filter(r => r.fs === META.updated).length;
+const AVOID = DATA.filter(r => r.f === 'Avoid').length;
 const uniq = a => [...new Set(a)].filter(Boolean).sort();
-uniq(DATA.flatMap(r => (r.tj||'').split('、'))).forEach(v => $('fJH').add(new Option(v, v)));
-uniq(DATA.map(r => r.w)).forEach(v => $('fWard').add(new Option(v, v)));
+const JHS = uniq(DATA.flatMap(r => (r.tj || '').split('、')));
+const WARDS = uniq(DATA.map(r => r.w));
 const rooms = l => { const m = /(\d)/.exec(l || ''); return m ? +m[1] : 0; };
-const yen = p => p == null ? '価格未定' : (p >= 10000 ? (p/10000).toFixed(p % 10000 ? 2 : 0).replace(/\.?0+$/,'') + '億' : p.toLocaleString()) + '万円';
-const score = r => (r.f === 'No flag found' ? 30 : r.f === 'Caution' ? 10 : 0)
-  + Math.min(r.sm || 0, 3) * 4 + Math.min(r.cl || 0, 5) + (r.pd ? 3 : 0)
-  + (r.rl != null ? Math.max(Math.min(r.rl, 10), -10) * 0.5 : 0)
-  + (10 - (r.wk || 10)) * 0.6 + (r.by ? (r.by - 2001) * 0.2 : 0) - (r.wd || 0) / 25;
-DATA.forEach(r => r.s = score(r));
-let shown = 40;
-function filtered(){
-  const t = $('fType').value, fl = $('fFlood').value, rv = $('fRiver').value, jh = $('fJH').value, w = $('fWard').value,
-        rm = +$('fRooms').value || 0, mx = +$('fMax').value || Infinity, so = $('fSort').value;
-  const out = DATA.filter(r => (!t || (t === '__new' ? r.fs === META.updated : r.t === t))
-    && (fl === '' || (fl === 'nf' ? r.f === 'No flag found' : r.f !== 'Avoid'))
-    && (rv === '' || (r.rv != null && r.rv <= +rv))
-    && (!jh || (r.tj || '').includes(jh)) && (!w || r.w === w)
-    && rooms(r.l) >= rm && (r.p == null ? mx === Infinity : r.p <= mx));
-  const k = {score:(a,b)=>b.s-a.s, pa:(a,b)=>(a.p??1e9)-(b.p??1e9), pd:(a,b)=>(b.p??-1)-(a.p??-1),
-    new:(a,b)=>(b.by??0)-(a.by??0), area:(a,b)=>(b.an??0)-(a.an??0), walk:(a,b)=>(a.wk??99)-(b.wk??99), elev:(a,b)=>(b.e??-99)-(a.e??-99)}[so];
-  return out.sort(k);
-}
-function chipFlood(r){
-  const unchecked = r.f === 'No flag found' && r.e == null;  // elevation lookup failed, so only the town lists were checked
-  const c = unchecked ? '' : r.f === 'Avoid' ? 'bad' : r.f === 'Caution' ? 'warn' : 'ok';
-  return `<span class="chip ${c}">${r.f}${unchecked ? ' · elevation unknown' : ''}</span>` + (r.fs === META.updated ? ' <span class="chip new">New</span>' : '');
-}
-const RIVER = ['No river flood mapped', 'River flood <0.5m', 'River flood 0.5–3m', 'River flood 3–5m', 'River flood 5–10m', 'River flood 10m+'];
-function chipRiver(r){
-  if (r.rv == null) return '<span class="chip">River flood unknown</span>';
-  const c = r.rv >= 3 ? 'bad' : r.rv === 2 ? 'warn' : '';
-  return `<span class="chip ${c}" title="Deepest GSI river-flood depth (max scale) within 100 m of the 丁目 point">${RIVER[r.rv]}</span>`;
-}
-function card(r){
-  const age = r.by ? `${2026 - r.by}年` : (r.t.startsWith('新築') ? '新築' : '');
-  return `<article class="card">
-    <div class="top"><div class="name"><span class="type">${r.t}</span>${esc(r.n)}</div><div class="price">${r.pt && r.p == null ? esc(r.pt) : yen(r.p)}</div></div>
-    <div class="facts"><span><b>${esc(r.l)}</b></span><span><b>${esc(r.a)}</b>m²</span>${r.ld ? `<span>土地 <b>${esc(String(r.ld))}</b>m²</span>` : ''}<span>${r.b ? '築 <b>' + esc(r.b) + '</b>' : esc(age)}</span><span>${esc(r.st)} 徒歩<b>${r.wk ?? '?'}</b>分</span></div>
-    <div class="facts"><span>${esc(r.ad)}</span></div>
-    <div class="chips">${chipFlood(r)}${chipRiver(r)}<span class="chip">${esc(r.jh)}</span><span class="chip">${esc(r.es)}</span>
-      ${r.e != null ? `<span class="chip num">標高 ${r.e.toFixed(0)}m${r.rl != null ? ` (${r.rl >= 0 ? '+' : ''}${r.rl.toFixed(0)})` : ''}</span>` : ''}</div>
-    ${r.fr ? `<div class="reason">${esc(r.fr)}</div>` : ''}
-    <div class="foot"><span>駅周辺: スーパー ${r.sm ?? '?'}${r.sn ? ' · ' + esc(r.sn) : ''} · クリニック ${r.cl ?? '?'}${r.pd ? ' · 小児科 ' + r.pd : ''} · ${esc(r.w)} 9/8被害 ${r.wd ?? '?'}棟</span><a href="${r.u}" target="_blank" rel="noopener">SUUMO →</a></div>
-  </article>`;
-}
-function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-let view = location.hash === '#map' ? 'map' : 'list';
-function render(){
-  const f = filtered();
-  const off = view === 'map' ? f.filter(r => r.la == null).length : 0;
-  $('count').textContent = `${f.length} of ${DATA.length} listings` + (off ? ` · ${off} without a map location` : '');
-  if (view === 'map') { $('list').innerHTML = ''; $('more').hidden = true; drawMap(f); return; }
-  $('list').innerHTML = f.slice(0, shown).map(card).join('');
-  $('more').hidden = f.length <= shown;
-}
-function setView(v){
-  view = v;
-  $('vList').setAttribute('aria-pressed', v === 'list');
-  $('vMap').setAttribute('aria-pressed', v === 'map');
-  $('mapWrap').hidden = v !== 'map';
-  document.body.classList.toggle('mapview', v === 'map');
-  history.replaceState(null, '', v === 'map' ? '#map' : location.pathname + location.search);
-  render();
-  if (v === 'map') ensureMap();
+
+function price(r) {
+  const p = r.p;
+  if (p == null || Number.isNaN(p)) return [r.pt || '価格未定', ''];
+  if (p >= 10000) {
+    const oku = Math.floor(p / 10000), rest = Math.round(p % 10000);
+    return rest ? [`${oku}億${rest.toLocaleString('ja-JP')}`, '万円'] : [`${oku}億`, '円'];
+  }
+  return [Math.round(p).toLocaleString('ja-JP'), '万円'];
 }
 
-// ---------- map: MapLibre + OpenFreeMap tiles, loaded on first use ----------
-const STATIONS = __STATIONS__;
-const ML = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl';
-let map, mapReady, popup, groups = new Map(), pinsGeo = {type: 'FeatureCollection', features: []};
-const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
-const worst = rs => rs.some(r => r.f === 'Avoid') ? 'Avoid' : rs.some(r => r.f === 'Caution') ? 'Caution' : 'No flag found';
-function bbox(rows){
-  const b = [[180, 90], [-180, -90]];
-  rows.forEach(r => { if (r.la == null) return;
-    b[0][0] = Math.min(b[0][0], r.lo); b[0][1] = Math.min(b[0][1], r.la); b[1][0] = Math.max(b[1][0], r.lo); b[1][1] = Math.max(b[1][1], r.la); });
-  return b;
+// ---------- state ----------
+const S = {type: '', newOnly: false, flood: 'nfc', river: '', jh: '', ward: '', rooms: 0, max: 0, sort: 'score', sel: null, shown: 60};
+
+function passes(r, ignoreType) {
+  return (ignoreType || !S.type || r.t === S.type)
+    && (!S.newOnly || r.fs === META.updated)
+    && (S.flood === '' || (S.flood === 'nf' ? r.f === 'No flag found' : r.f !== 'Avoid'))
+    && (S.river === '' || (r.rv != null && r.rv <= +S.river))
+    && (!S.jh || (r.tj || '').includes(S.jh)) && (!S.ward || r.w === S.ward)
+    && rooms(r.l) >= S.rooms && (!S.max || (r.p != null && r.p <= S.max));
 }
-function loadLib(){
-  if (window.maplibregl) return Promise.resolve();
+const SORTS = {
+  score: (a, b) => b.s - a.s, pa: (a, b) => (a.p ?? 1e9) - (b.p ?? 1e9), pd: (a, b) => (b.p ?? -1) - (a.p ?? -1),
+  new: (a, b) => (b.by ?? 0) - (a.by ?? 0), area: (a, b) => (b.an ?? 0) - (a.an ?? 0),
+  walk: (a, b) => (a.wk ?? 99) - (b.wk ?? 99), elev: (a, b) => (b.e ?? -99) - (a.e ?? -99)
+};
+let VIEW = [];
+function compute() { VIEW = DATA.filter(r => passes(r)).sort(SORTS[S.sort]); }
+
+// ---------- listing rows ----------
+function flagOf(r) {
+  const t = T();
+  if (r.f === 'Avoid') return ['avoid', t.fAvoid];
+  if (r.f === 'Caution') return ['caution', t.fCaution];
+  return r.e == null ? ['unknown', t.fNoneUnknown] : ['', t.fNone];
+}
+function builtOf(r) {
+  const t = T();
+  if (r.t.startsWith('新築')) return r.by && r.by > THIS_YEAR ? t.ready(r.by) : t.newBuild;
+  return r.by ? t.built(r.by) : '';
+}
+function whyOf(r) {
+  const t = T();
+  if (!r.fr) return esc(r.f === 'No flag found' && r.e == null ? t.whyUnchecked : t.whyNone);
+  return r.fr.split('; ').map(s => {
+    let m = /^Low ground \((-?\d+) m\)/.exec(s); if (m) return esc(t.whyLow(m[1]));
+    m = /^Local low spot \(≈(-?\d+) m/.exec(s); if (m) return esc(t.whyLowSpot(Math.abs(+m[1])));
+    return esc(s);  // hand-written research notes stay as written
+  }).join('; ');
+}
+function rowHTML(r) {
+  const t = T(), [pm, pu] = price(r), [fc, fl] = flagOf(r), sel = S.sel === r.id;
+  const rv = r.rv == null ? ['x', t.rUnknown] : [Math.min(r.rv, 3), t.rivers[r.rv]];
+  const nAds = 1 + (r.al ? r.al.length : 0);
+  let h = `<article class="row${sel ? ' sel' : ''}" id="r${r.id}" data-id="${r.id}">
+<button type="button" class="rowbtn" aria-expanded="${sel}">
+<span class="r1"><span class="price"><b>${esc(pm)}</b><small>${esc(pu)}</small></span><span class="ptype">${ja(r.t)}</span></span>
+<span class="name ja" lang="ja">${esc(r.n)}</span>
+<span class="facts">${ja(r.l)}<span>${esc(r.a)}㎡</span>${r.ld ? `<span>${t.land} ${esc(r.ld)}㎡</span>` : ''}<span class="muted">${esc(builtOf(r))}</span>${r.fs === META.updated ? `<span class="newtag">${t.isNew}</span>` : ''}</span>
+<span class="where"><span class="stn">${badges(r.st)}${ja(r.st)}<span class="muted">${esc(t.walk(r.wk ?? '?'))}</span></span><span>${ja(r.tj || r.jh)} ${t.district}</span></span>
+<span class="risk"><span class="flag"><i class="mk ${fc}"></i>${esc(fl)}</span><span class="rv-${rv[0]}">${esc(rv[1])}</span>${nAds > 1 ? `<span class="muted">${esc(t.ads(nAds))}</span>` : ''}</span>
+</button>`;
+  if (sel) {
+    const elev = r.e == null ? t.elevUnknown : t.elev(r.e) + (r.rl != null ? t.rel(r.rl) : '');
+    h += `<div class="details"><dl>
+<dt>${t.dAddress}</dt><dd>${ja(r.ad)}</dd>
+<dt>${t.dSchools}</dt><dd>${ja([r.es, r.jh].filter(Boolean).join('、'))}</dd>
+<dt>${t.dElev}</dt><dd>${esc(elev)}</dd>
+<dt>${t.dWhy}</dt><dd>${whyOf(r)}</dd>
+<dt>${t.dNear}</dt><dd>${badges(r.st)} ${ja(r.st)} ${esc(t.near(r.sm, r.sn, r.cl, r.pd))}</dd>
+${r.wd != null ? `<dt>${t.dWard}</dt><dd>${esc(t.wardDamage(r.w, r.wd))}</dd>` : ''}
+</dl><div class="links">
+<a class="btn primary" href="${esc(r.u)}" target="_blank" rel="noopener">${t.openSuumo}</a>
+${r.k ? `<button type="button" class="btn secondary showmap" data-map="${r.id}">${t.showOnMap}</button>` : ''}
+${nAds > 1 ? `<span class="alts">${t.otherAds}${r.al.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener" aria-label="${esc(t.otherAds)} ${i + 2}">${i + 2}</a>`).join('')}</span>` : ''}
+</div></div>`;
+  }
+  return h + '</article>';
+}
+
+function renderList() {
+  const t = T();
+  const off = VIEW.filter(r => r.k == null).length;
+  $('count').innerHTML = esc(t.count(VIEW.length)) + (off ? `<span class="muted">${esc(t.noLoc(off))}</span>` : '');
+  if (!VIEW.length) { $('list').innerHTML = `<p class="empty">${t.empty}</p>`; return; }
+  const si = S.sel == null ? -1 : VIEW.findIndex(r => r.id === S.sel);
+  if (si >= S.shown) S.shown = si + 1;
+  $('list').innerHTML = VIEW.slice(0, S.shown).map(rowHTML).join('')
+    + (VIEW.length > S.shown ? `<button type="button" class="moreBtn" id="moreBtn">${t.more} (${VIEW.length - S.shown})</button>` : '');
+}
+function rerenderRow(id) {
+  const el = $('r' + id), r = DATA[id];
+  if (el && r) el.outerHTML = rowHTML(r);
+}
+
+// ---------- filters ----------
+function setOptions(sel, opts, v) {
+  sel.innerHTML = opts.map(([val, label, isJa]) => `<option value="${esc(val)}"${isJa ? ' lang="ja"' : ''}>${esc(label)}</option>`).join('');
+  sel.value = opts.some(o => String(o[0]) === v) ? v : String(opts[0][0]);
+}
+function renderTypes() {
+  const t = T(), base = DATA.filter(r => passes(r, true));
+  const btn = (val, label, n, isJa) => `<button type="button" data-type="${esc(val)}" aria-pressed="${S.type === val}">${isJa ? ja(label) : esc(label)}<span class="n">${n}</span></button>`;
+  $('types').innerHTML = btn('', t.all, base.length, false) + TYPES.map(ty => btn(ty, ty, base.filter(r => r.t === ty).length, true)).join('');
+  $('fNew').setAttribute('aria-pressed', S.newOnly);
+  $('newN').textContent = NEW;
+  const active = [S.flood !== 'nfc', S.river, S.jh, S.ward, S.rooms, S.max].filter(Boolean).length;
+  $('activeN').hidden = !active; $('activeN').textContent = active;
+}
+function applyLang() {
+  const t = T();
+  document.documentElement.lang = t.code;
+  document.title = t.title;
+  try { localStorage.setItem('lang', LANG); } catch (e) {}
+  document.querySelectorAll('[data-i]').forEach(el => { el.textContent = typeof t[el.dataset.i] === 'string' ? t[el.dataset.i] : ''; });
+  document.querySelectorAll('[data-i-aria]').forEach(el => el.setAttribute('aria-label', t[el.dataset.iAria]));
+  document.querySelectorAll('[data-i-ph]').forEach(el => el.setAttribute('placeholder', t[el.dataset.iPh]));
+  document.querySelectorAll('#langs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === LANG));
+  $('sub').textContent = t.sub(DATA.length - AVOID, t.date(META.updated));
+  $('aboutBody').innerHTML = t.aboutHtml;
+  setOptions($('fFlood'), [['nfc', t.hideAvoid], ['nf', t.noFlagOnly], ['', t.showAll(AVOID)]], S.flood);
+  setOptions($('fRiver'), [['', t.anyDepth], ['0', t.noneMapped], ['1', t.under05], ['2', t.under3]], S.river);
+  setOptions($('fJH'), [['', t.allDistricts(JHS.length)], ...JHS.map(v => [v, v, true])], S.jh);
+  setOptions($('fWard'), [['', t.allWards], ...WARDS.map(v => [v, v, true])], S.ward);
+  setOptions($('fRooms'), [['0', t.any], ['2', t.bedN(2)], ['3', t.bedN(3)], ['4', t.bedN(4)]], String(S.rooms));
+  setOptions($('fSort'), [['score', t.sBest], ['pa', t.sPriceUp], ['pd', t.sPriceDown], ['new', t.sNew], ['area', t.sLargest], ['walk', t.sWalk], ['elev', t.sHigh]], S.sort);
+  renderTypes(); renderList(); updatePriceMarker();
+}
+function onFilter() {
+  S.flood = $('fFlood').value; S.river = $('fRiver').value; S.jh = $('fJH').value; S.ward = $('fWard').value;
+  S.rooms = +$('fRooms').value || 0; S.max = +$('fMax').value || 0; S.sort = $('fSort').value; S.shown = 60;
+  compute();
+  if (S.sel != null && !VIEW.some(r => r.id === S.sel)) S.sel = null;
+  renderTypes(); renderList(); drawPins(true);
+}
+['fFlood', 'fRiver', 'fJH', 'fWard', 'fRooms', 'fMax'].forEach(id => $(id).addEventListener('input', onFilter));
+$('fSort').addEventListener('input', () => { S.sort = $('fSort').value; S.shown = 60; compute(); renderList(); });
+$('types').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.type = b.dataset.type; onFilter(); });
+$('fNew').addEventListener('click', () => { S.newOnly = !S.newOnly; onFilter(); });
+$('filterBtn').addEventListener('click', () => { const open = $('more').classList.toggle('open'); $('filterBtn').setAttribute('aria-expanded', open); });
+$('langs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || b.dataset.lang === LANG) return; LANG = b.dataset.lang; applyLang(); });
+$('aboutBtn').addEventListener('click', () => $('about').showModal());
+
+// ---------- selection ----------
+const wide = () => matchMedia('(min-width:1000px)').matches;
+function select(id, {fromMap = false} = {}) {
+  const prev = S.sel;
+  S.sel = prev === id && !fromMap ? null : id;
+  const idx = VIEW.findIndex(r => r.id === S.sel);
+  if (idx >= S.shown) { S.shown = idx + 1; renderList(); }
+  else { if (prev != null) rerenderRow(prev); if (S.sel != null && S.sel !== prev) rerenderRow(S.sel); }
+  updateSelection();
+  if (S.sel != null && fromMap) $('r' + S.sel)?.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+  if (S.sel != null && !fromMap && wide()) focusPin(DATA[S.sel]);
+}
+$('list').addEventListener('click', e => {
+  if (e.target.closest('#moreBtn')) { S.shown += 60; renderList(); return; }
+  const sm = e.target.closest('[data-map]');
+  if (sm) { $('mapPane').scrollIntoView({behavior: 'smooth'}); focusPin(DATA[+sm.dataset.map], true); return; }
+  const b = e.target.closest('.rowbtn'); if (b) select(+b.closest('.row').dataset.id);
+});
+$('list').addEventListener('mouseover', e => { const row = e.target.closest('.row'); hover(row ? DATA[+row.dataset.id] : null); });
+$('list').addEventListener('mouseleave', () => hover(null));
+
+// ---------- map: MapLibre + OpenFreeMap, loaded after the list ----------
+const ML = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl';
+let map, priceMarker;
+function loadLib() {
   return new Promise((ok, fail) => {
     const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = ML + '.css'; document.head.append(l);
     const s = document.createElement('script'); s.src = ML + '.js'; s.onload = ok; s.onerror = fail; document.head.append(s);
   });
 }
-async function baseStyle(){
-  const st = await (await fetch('https://tiles.openfreemap.org/styles/' + (isDark() ? 'dark' : 'positron'))).json();
-  const ja = ['coalesce', ['get', 'name:ja'], ['get', 'name:nonlatin'], ['get', 'name']];  // Japanese labels only
-  st.layers = st.layers.filter(l => !/shield|oneway|highway-name-(path|minor)|highway_name_other|airport/.test(l.id)  // quieter basemap
-    && !(l.paint && l.paint['fill-pattern']));  // the dark style references a sprite image it doesn't ship
-  st.layers.forEach(l => { const t = l.layout && l.layout['text-field']; if (t && JSON.stringify(t).includes('name')) l.layout['text-field'] = ja; });
+async function baseStyle() {
+  const st = await (await fetch('https://tiles.openfreemap.org/styles/positron')).json();
+  const name = ['coalesce', ['get', 'name:ja'], ['get', 'name:nonlatin'], ['get', 'name']];  // Japanese place names
+  st.layers = st.layers.filter(l => !/shield|oneway|highway-name-(path|minor)|airport/.test(l.id) && !(l.paint && l.paint['fill-pattern']));
+  st.layers.forEach(l => { const t = l.layout && l.layout['text-field']; if (t && JSON.stringify(t).includes('name')) l.layout['text-field'] = name; });
+  st.layers.filter(l => l.id === 'label_other').forEach(l => { l.paint = {...l.paint, 'text-color': '#9AA4AF'}; });  // quieter 町/丁目 names
   return st;
 }
-function addLayers(){
-  if (map.getSource('pins')) return;
-  $('mapWrap').classList.toggle('dark', isDark());
-  const firstLabel = map.getStyle().layers.find(l => l.type === 'symbol')?.id;
+function pinsGeo() {
+  const g = new Map();
+  VIEW.forEach(r => { if (r.k == null) return; if (!g.has(r.k)) g.set(r.k, []); g.get(r.k).push(r); });
+  return {type: 'FeatureCollection', features: [...g].map(([k, rs]) => ({type: 'Feature', geometry: {type: 'Point', coordinates: [rs[0].lo, rs[0].la]},
+    properties: {k, n: rs.length, f: rs.some(r => r.f === 'Avoid') ? 'a' : rs.some(r => r.f === 'Caution') ? 'c' : 'p'}}))};
+}
+function bounds(rows) {
+  const b = [[180, 90], [-180, -90]];
+  rows.forEach(r => { if (r.k == null) return; b[0][0] = Math.min(b[0][0], r.lo); b[0][1] = Math.min(b[0][1], r.la); b[1][0] = Math.max(b[1][0], r.lo); b[1][1] = Math.max(b[1][1], r.la); });
+  return b[0][0] > b[1][0] ? null : b;
+}
+function addStations() {
+  STATIONS.forEach(([n, la, lo]) => {
+    const el = document.createElement('div');
+    el.className = 'stn-mk';
+    el.innerHTML = `<i></i>${badges(n)}<b class="ja" lang="ja">${esc(n)}</b>`;
+    new maplibregl.Marker({element: el, anchor: 'left', offset: [-6, 0]}).setLngLat([lo, la]).addTo(map);
+  });
+}
+function addLayers() {
   map.addSource('flood', {type: 'raster', tileSize: 256, minzoom: 2, maxzoom: 17,
     tiles: ['https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png'],
     attribution: '洪水浸水想定: <a href="https://disaportal.gsi.go.jp/" target="_blank" rel="noopener">国土地理院 重ねるハザードマップ</a>'});
-  map.addLayer({id: 'flood', type: 'raster', source: 'flood', paint: {'raster-opacity': 0.6},
-    layout: {visibility: $('fFloodMap').checked ? 'visible' : 'none'}}, firstLabel);
-  map.addSource('stations', {type: 'geojson', data: {type: 'FeatureCollection', features: STATIONS.map(([n, la, lo]) =>
-    ({type: 'Feature', geometry: {type: 'Point', coordinates: [lo, la]}, properties: {n}}))}});
-  map.addSource('pins', {type: 'geojson', data: pinsGeo});
-  const fg = cssVar('--fg'), surface = cssVar('--surface');
-  map.addLayer({id: 'st', type: 'circle', source: 'stations',
-    paint: {'circle-radius': 4, 'circle-color': surface, 'circle-stroke-color': fg, 'circle-stroke-width': 2}});
-  map.addLayer({id: 'st-label', type: 'symbol', source: 'stations', minzoom: 12,
-    layout: {'text-field': ['get', 'n'], 'text-font': ['Noto Sans Bold'], 'text-size': 11, 'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-optional': true},
-    paint: {'text-color': fg, 'text-halo-color': surface, 'text-halo-width': 1.5}});
-  map.addLayer({id: 'pins', type: 'circle', source: 'pins',
-    paint: {'circle-radius': ['interpolate', ['linear'], ['zoom'],  // smaller pins when zoomed out to the whole city
-        11, ['interpolate', ['linear'], ['get', 'n'], 1, 4, 2, 6, 10, 9], 14, ['interpolate', ['linear'], ['get', 'n'], 1, 6, 2, 8, 10, 13]],
-      'circle-color': ['match', ['get', 'f'], 'Avoid', cssVar('--bad'), 'Caution', cssVar('--warn'), cssVar('--ok')],
-      'circle-stroke-color': surface, 'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 11, 1.5, 14, 2]}});
-  map.addLayer({id: 'pin-n', type: 'symbol', source: 'pins', filter: ['>', ['get', 'n'], 1],
-    layout: {'text-field': ['to-string', ['get', 'n']], 'text-font': ['Noto Sans Bold'], 'text-size': ['interpolate', ['linear'], ['zoom'], 11, 8, 14, 10], 'text-allow-overlap': true, 'text-ignore-placement': true},
-    paint: {'text-color': surface}});
+  const firstLabel = map.getStyle().layers.find(l => l.type === 'symbol')?.id;
+  map.addLayer({id: 'flood', type: 'raster', source: 'flood', paint: {'raster-opacity': 0.6}, layout: {visibility: $('fFloodMap').checked ? 'visible' : 'none'}}, firstLabel);
+  map.addLayer({id: 'subway', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation',
+    filter: ['all', ['==', ['get', 'class'], 'transit'], ['==', ['get', 'brunnel'], 'tunnel']],
+    paint: {'line-color': '#17202E', 'line-opacity': 0.55, 'line-width': ['interpolate', ['linear'], ['zoom'], 11, 1.2, 15, 2.5], 'line-dasharray': [2, 1.5]}}, firstLabel);
+  map.addSource('pins', {type: 'geojson', data: pinsGeo()});
+  const r = (lo, hi) => ['interpolate', ['linear'], ['zoom'], 11, ['interpolate', ['linear'], ['get', 'n'], 1, lo[0], 10, lo[1]], 15, ['interpolate', ['linear'], ['get', 'n'], 1, hi[0], 10, hi[1]]];
+  map.addLayer({id: 'pins', type: 'circle', source: 'pins', paint: {
+    'circle-radius': r([4, 8], [7, 13]), 'circle-color': ['match', ['get', 'f'], 'a', '#B42318', 'c', '#C46A12', '#2D4E86'],
+    'circle-stroke-color': '#FFFFFF', 'circle-stroke-width': 2}});
+  map.addLayer({id: 'pin-n', type: 'symbol', source: 'pins', filter: ['>', ['get', 'n'], 1], layout: {
+    'text-field': ['to-string', ['get', 'n']], 'text-font': ['Noto Sans Bold'], 'text-size': ['interpolate', ['linear'], ['zoom'], 11, 8, 15, 11],
+    'text-allow-overlap': true, 'text-ignore-placement': true}, paint: {'text-color': '#FFFFFF'}});
+  map.addLayer({id: 'pin-hover', type: 'circle', source: 'pins', filter: ['==', ['get', 'k'], ''], paint: {
+    'circle-radius': r([7, 10], [10, 15]), 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': '#17202E', 'circle-stroke-width': 3}});
+  map.addLayer({id: 'pin-sel', type: 'circle', source: 'pins', filter: ['==', ['get', 'k'], ''], paint: {
+    'circle-radius': r([8, 11], [11, 16]), 'circle-color': '#F5B700', 'circle-stroke-color': '#17202E', 'circle-stroke-width': 3}});
 }
-function ensureMap(){
-  if (mapReady) return mapReady;
-  mapReady = loadLib().then(baseStyle).then(style => new Promise(ok => {
-    map = new maplibregl.Map({container: 'map', style, bounds: bbox(DATA), fitBoundsOptions: {padding: 40},
-      attributionControl: {compact: true}, dragRotate: false, pitchWithRotate: false,
-      cooperativeGestures: matchMedia('(pointer: coarse)').matches});
+function drawPins(fit) {
+  if (!map || !map.getSource('pins')) return;
+  map.getSource('pins').setData(pinsGeo());
+  $('lgAvoid').hidden = !VIEW.some(r => r.f === 'Avoid');
+  updateSelection();
+  const b = bounds(VIEW);
+  if (fit && b) map.fitBounds(b, {padding: 50, maxZoom: 15, duration: 500});
+}
+function hover(r) {
+  if (map && map.getLayer('pin-hover')) map.setFilter('pin-hover', ['==', ['get', 'k'], r && r.k ? r.k : '']);
+}
+function updatePriceMarker() {
+  if (!map) return;
+  const r = S.sel != null ? DATA[S.sel] : null;
+  if (!r || r.k == null) { priceMarker?.remove(); priceMarker = null; return; }
+  const [pm, pu] = price(r);
+  if (!priceMarker) { const el = document.createElement('div'); el.className = 'price-mk'; priceMarker = new maplibregl.Marker({element: el, anchor: 'top', offset: [0, 14]}); }
+  priceMarker.getElement().textContent = pm + pu;
+  priceMarker.setLngLat([r.lo, r.la]).addTo(map);
+}
+function updateSelection() {
+  const r = S.sel != null ? DATA[S.sel] : null;
+  if (map && map.getLayer('pin-sel')) map.setFilter('pin-sel', ['==', ['get', 'k'], r && r.k ? r.k : '']);
+  updatePriceMarker();
+}
+function focusPin(r, force) {
+  if (!map || !r || r.k == null) return;
+  const inView = map.getBounds().contains([r.lo, r.la]);
+  if (force || !inView || map.getZoom() < 13) map.easeTo({center: [r.lo, r.la], zoom: Math.max(map.getZoom(), 14), duration: 600});
+}
+async function initMap() {
+  try {
+    await loadLib();
+    const style = await baseStyle();
+    map = new maplibregl.Map({container: 'map', style, bounds: bounds(VIEW) || [[136.9, 35.1], [137.03, 35.2]], fitBoundsOptions: {padding: 50},
+      attributionControl: {compact: true}, dragRotate: false, pitchWithRotate: false, cooperativeGestures: matchMedia('(pointer: coarse)').matches});
     map.touchZoomRotate.disableRotation();
     map.addControl(new maplibregl.NavigationControl({showCompass: false}), 'top-right');
-    map.on('style.load', addLayers);
+    const zoomClass = () => $('map').classList.toggle('zoomed-out', map.getZoom() < 12.3);
+    map.on('load', () => { addLayers(); addStations(); drawPins(false); zoomClass(); });
+    map.on('zoomend', zoomClass);
     map.on('click', 'pins', e => {
-      const ft = e.features[0], rs = groups.get(ft.properties.k) || [];
-      const head = rs.length > 1 ? `${rs.length} listings in this 丁目 · approximate location` : 'Approximate location (丁目)';
-      popup?.remove();
-      popup = new maplibregl.Popup({maxWidth: 'none', focusAfterOpen: false}).setLngLat(ft.geometry.coordinates)
-        .setHTML(`<div class="pop"><div class="ph">${head}</div>${rs.map(card).join('')}</div>`).addTo(map);
+      const k = e.features[0].properties.k;
+      const first = VIEW.find(r => r.k === k);
+      if (first) select(first.id, {fromMap: true});
     });
     map.on('mouseenter', 'pins', () => map.getCanvas().style.cursor = 'pointer');
     map.on('mouseleave', 'pins', () => map.getCanvas().style.cursor = '');
-    map.once('load', () => { addLayers(); render(); ok(); });
-  })).catch(() => { mapReady = null; $('map').innerHTML = '<div class="mapmsg">Map could not load. Check your connection and try again.</div>'; });
-  return mapReady;
-}
-function drawMap(f){
-  groups = new Map();
-  f.forEach(r => { if (r.la == null) return; const k = r.la + ',' + r.lo; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(r); });
-  pinsGeo = {type: 'FeatureCollection', features: [...groups].map(([k, rs]) =>
-    ({type: 'Feature', geometry: {type: 'Point', coordinates: [rs[0].lo, rs[0].la]}, properties: {k, n: rs.length, f: worst(rs)}}))};
-  if (!map || !map.getSource('pins')) return;
-  popup?.remove();
-  map.getSource('pins').setData(pinsGeo);
-  if (pinsGeo.features.length) map.fitBounds(bbox(f), {padding: 50, maxZoom: 15, duration: 500});
+  } catch (e) {
+    $('map').innerHTML = `<p class="mapmsg">${esc(T().mapFail)}</p>`;
+  }
 }
 $('fFloodMap').addEventListener('change', e => {
   $('depth').hidden = !e.target.checked;
   if (map?.getLayer('flood')) map.setLayoutProperty('flood', 'visibility', e.target.checked ? 'visible' : 'none');
 });
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', async () => {
-  if (map) map.setStyle(await baseStyle(), {diff: false});  // style.load re-adds the overlays in the new palette
-});
-$('vList').addEventListener('click', () => setView('list'));
-$('vMap').addEventListener('click', () => setView('map'));
-function stats(){
-  const n = t => DATA.filter(r => r.t === t && r.f !== 'Avoid').length;
-  const s = [['中古マンション', n('中古マンション')], ['新築マンション', n('新築マンション')], ['中古一戸建て', n('中古一戸建て')], ['新築一戸建て', n('新築一戸建て')],
-    ['Flagged Avoid', DATA.filter(r => r.f === 'Avoid').length], ['New this week', META.new]];
-  $('stats').innerHTML = s.map(([k, v]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join('');
-}
-['fType','fFlood','fRiver','fJH','fWard','fRooms','fMax','fSort'].forEach(id => $(id).addEventListener('input', () => { shown = 40; render(); }));
-$('more').addEventListener('click', () => { shown += 40; render(); });
-stats(); setView(view);
+
+compute();
+applyLang();
+initMap();
 </script>
+</body>
+</html>

@@ -182,6 +182,22 @@ def river_depth(q, lat, lon):
     return best
 
 
+# ---------- one card per property ----------
+PROMO = re.compile(r'[【】◆◇■□★☆♪!！「」『』・]|駅|徒歩|キャンペーン|見学|限定|プレゼント')
+
+
+def same_property_key(r):
+    """Different agents' ads for one property share type, 丁目, price and floor area (plus land area for houses)."""
+    if pd.isna(r['price_man_yen']) or pd.isna(r['area_num']):
+        return r['url']
+    land = ''
+    if '一戸建て' in r['type']:
+        m = re.search(r'[\d.]+', str(r['land_m2']))
+        land = str(round(float(m.group()))) if m else ''
+    ch = '' if r['chome_no'] is None or pd.isna(r['chome_no']) else int(r['chome_no'])
+    return f"{r['type']}|{r['ward']}|{nz(r['town'] or '')}|{ch}|{r['price_man_yen']}|{round(r['area_num'])}|{land}"
+
+
 def main():
     raw = json.loads((D / 'listings_raw.json').read_text())
     rules = json.loads((D / 'static' / 'flood_rules.json').read_text())
@@ -202,8 +218,11 @@ def main():
     df['jh'] = [s[1] for s in sch]
     df['tj'] = df.jh.apply(lambda s: '、'.join(t for t in config.TARGET_JH if isinstance(s, str) and t in s))
     df = df[df.tj != ''].copy()
-    df['key'] = df.type + '|' + df.address + '|' + df.price_man_yen.astype(str) + '|' + df.area_num.round(0).astype(str)
-    df = df.drop_duplicates('key')
+    df['key'] = df.apply(same_property_key, axis=1)
+    ads = df.groupby('key').url.apply(list)
+    addr = df.groupby('key').address.apply(lambda s: max(s, key=len))  # most precise address among the ads
+    df['promo'] = df.name.astype(str).apply(lambda n: (len(PROMO.findall(n)), len(n)))
+    df = df.sort_values('promo', kind='stable').drop_duplicates('key')  # keep the ad with the plainest name
 
     budget = [200]
     out = []
@@ -233,19 +252,21 @@ def main():
             if rel is not None and rel <= rules['local_low_spot_m']:
                 flag = 'Caution'; reasons.append(f'Local low spot (≈{rel:.0f} m below surroundings)')
         a = am.loc[r.station] if r.station in am.index else None
-        first = seen.setdefault(r.url, today if existed else 'initial')
+        group = ads[r.key]
+        dates = [seen.setdefault(u, today if existed else 'initial') for u in group]
+        first = 'initial' if 'initial' in dates else min(dates)  # a re-posted old property is not new
         out.append(dict(
-            t=r.type, n=str(r.name)[:60], p=r.price_man_yen, pt=r.price_text if r.price_man_yen is None else '',
+            t=r.type, n=re.sub(r'[◆◇■□★☆♪]+', ' ', str(r.name)).strip()[:60], p=r.price_man_yen, pt=r.price_text if r.price_man_yen is None else '',
             l=r.layout, a=r.area_m2, an=None if pd.isna(r.area_num) else r.area_num, ld=r.land_m2, b=r.built,
             by=None if r.built_year is None or pd.isna(r.built_year) else int(r.built_year),
-            ad=r.address, w=r.ward, st=r.station, wk=r.walk_min, es=r.es, jh=r.jh, tj=r.tj,
+            ad=addr[r.key], w=r.ward, st=r.station, wk=r.walk_min, es=r.es, jh=r.jh, tj=r.tj,
             f=flag, fr='; '.join(reasons), e=e, rl=rel, wd=rules['ward_damage_2026_09'].get(r.ward),
             sm=None if a is None else int(a.supermarkets_n),
             sn='' if a is None or not isinstance(a.supermarkets_names, str) else re.split('[;、|]', a.supermarkets_names)[0].strip(),
             cl=None if a is None else int(a.clinics_n), pd=None if a is None else int(a.pediatric_n),
-            u=r.url, fs=first, la=la, lo=lo, rv=rv))
+            u=r.url, al=[u for u in group if u != r.url], fs=first, la=la, lo=lo, rv=rv))
 
-    current = {o['u'] for o in out}
+    current = {u for o in out for u in [o['u'], *o['al']]}
     seen = {k: v for k, v in seen.items() if k in current}
     seen_path.write_text(json.dumps(seen, ensure_ascii=False, indent=0))
     GEO.assign(river_cls=GEO.geo_q.map(RIVER).astype('Int64')).to_csv(GEO_PATH, index=False)
